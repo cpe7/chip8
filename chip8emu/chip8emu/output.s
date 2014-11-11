@@ -1,635 +1,625 @@
-0: 1225 - Jump to location 225
-1: 6000 - Set V0 = 0
-2: 6100 - Set V1 = 0
-3: 6208 - Set V2 = 8
-4: ffd3 - 
-5: d018 - Display 8 - byte sprite starting at memory location I at
-(V0, V1), set VF = collision.
-6: 7108 - Set V1 = 1 + 8
-7: f21e - Set I = I + V2
-8: 3120 - Skip next instruction if V1 = 20
-9: 122d - Jump to location 22d
-a: 7008 - Set V0 = 0 + 8
-b: 6100 - Set V1 = 0
-c: 3040 - Skip next instruction if V0 = 40
-d: 122d - Jump to location 22d
-e: 6905 - Set V9 = 5
-f: 6c15 - Set Vc = 15
-10: 6e00 - Set Ve = 0
-11: ff87 - 
-12: 600a - Set V0 = a
-13: f015 - Set delay timer = V0
-14: f007 - Set V0 = delay timer value (the value of DT is placed into it).
-15: 3000 - Skip next instruction if V0 = 0
-16: 124b - Jump to location 24b
-17: ff87 - 
-18: 7e01 - Set Ve = e + 1
-19: 1245 - Jump to location 245
-1a: 6600 - Set V6 = 0
-1b: 681c - Set V8 = 1c
-1c: 6900 - Set V9 = 0
-1d: 6a04 - Set Va = 4
-1e: 6b0a - Set Vb = a
-1f: 6c04 - Set Vc = 4
-20: 6d3c - Set Vd = 3c
-21: 6e0f - Set Ve = f
-22: ffe0 - 
-23: 236b - Call subroutine at 36b
-24: 2347 - Call subroutine at 347
-25: fd15 - Set delay timer = Vd
-26: 6004 - Set V0 = 4
-27: ff9e - 
-28: 127d - Jump to location 27d
-29: 236b - Call subroutine at 36b
-2a: 3800 - Skip next instruction if V8 = 0
-2b: ffff - 
-2c: 236b - Call subroutine at 36b
-2d: 6006 - Set V0 = 6
-2e: ff9e - 
-2f: ff8b - 
-30: 236b - Call subroutine at 36b
-31: 3839 - Skip next instruction if V8 = 39
-32: 7801 - Set V8 = 8 + 1
-33: 236b - Call subroutine at 36b
-34: 3600 - Skip next instruction if V6 = 0
-35: ff9f - 
-36: 6005 - Set V0 = 5
-37: ff9e - 
-38: ffe9 - 
-39: 6601 - Set V6 = 1
-3a: 651b - Set V5 = 1b
-3b: ff80 - 
-3c: ffcf - 
-3d: d451 - Display 1 - byte sprite starting at memory location I at
-(V4, V5), set VF = collision.
-3e: ffcf - 
-3f: d451 - Display 1 - byte sprite starting at memory location I at
-(V4, V5), set VF = collision.
-40: ffff - 
-41: ffff - 
-42: ffad - 
-43: 6600 - Set V6 = 0
-44: ffe9 - 
-45: d451 - Display 1 - byte sprite starting at memory location I at
-(V4, V5), set VF = collision.
-46: 3f01 - Skip next instruction if Vf = 1
-47: ffe9 - 
-48: d451 - Display 1 - byte sprite starting at memory location I at
-(V4, V5), set VF = collision.
-49: 6600 - Set V6 = 0
-4a: 8340 - Set V3 = V4
-4b: 7303 - Set V3 = 3 + 3
-4c: ffb5 - 
-4d: fff8 - 
-4e: 8322 - Set V3 = V3 OR V2
-4f: 6208 - Set V2 = 8
-50: 3300 - Skip next instruction if V3 = 0
-51: ffc9 - 
-52: 2373 - Call subroutine at 373
-53: 8206 - Set V2 = V2x SHR 1.
-54: 4308 - Skip next instruction if V3 != 8
-55: ffd3 - 
-56: 3310 - Skip next instruction if V3 = 10
-57: ffd5 - 
-58: 2373 - Call subroutine at 373
-59: 8206 - Set V2 = V2x SHR 1.
-5a: 3318 - Skip next instruction if V3 = 18
-5b: ffdd - 
-5c: 2373 - Call subroutine at 373
-5d: 8206 - Set V2 = V2x SHR 1.
-5e: 4320 - Skip next instruction if V3 != 20
-5f: ffe7 - 
-60: 3328 - Skip next instruction if V3 = 28
-61: ffe9 - 
-62: 2373 - Call subroutine at 373
-63: 3e00 - Skip next instruction if Ve = 0
-64: 1307 - Jump to location 307
-65: 7906 - Set V9 = 9 + 6
-66: 4918 - Skip next instruction if V9 != 18
-67: 6900 - Set V9 = 0
-68: 6a04 - Set Va = 4
-69: 6b0a - Set Vb = a
-6a: 6c04 - Set Vc = 4
-6b: fff4 - 
-6c: 6e0f - Set Ve = f
-6d: ffe0 - 
-6e: 2347 - Call subroutine at 347
-6f: 236b - Call subroutine at 36b
-70: fd15 - Set delay timer = Vd
-71: 126f - Jump to location 26f
-72: f707 - Set V7 = delay timer value (the value of DT is placed into it).
-73: 3700 - Skip next instruction if V7 = 0
-74: 126f - Jump to location 26f
-75: fd15 - Set delay timer = Vd
-76: 2347 - Call subroutine at 347
-77: ffa4 - 
-78: 3b12 - Skip next instruction if Vb = 12
-79: 131b - Jump to location 31b
-7a: 7c02 - Set Vc = c + 2
-7b: fffc - 
-7c: 3b02 - Skip next instruction if Vb = 2
-7d: 1323 - Jump to location 323
-7e: 7c02 - Set Vc = c + 2
-7f: 6a04 - Set Va = 4
-80: 2347 - Call subroutine at 347
-81: 3c18 - Skip next instruction if Vc = 18
-82: 126f - Jump to location 26f
-83: ffe0 - 
-84: ffd3 - 
-85: 6014 - Set V0 = 14
-86: 6108 - Set V1 = 8
-87: 620f - Set V2 = f
-88: d01f - Display f - byte sprite starting at memory location I at
-(V0, V1), set VF = collision.
-89: 7008 - Set V0 = 0 + 8
-8a: f21e - Set I = I + V2
-8b: 302c - Skip next instruction if V0 = 2c
-8c: 1333 - Jump to location 333
-8d: f00a - Wait for a key press, store the value of the key in V0
-8e: ffe0 - 
-8f: fff4 - 
-90: fe65 - Read registers V0 through Ve from memory starting at location I.
-91: 1225 - Jump to location 225
-92: ffb7 - 
-93: f91e - Set I = I + V9
-94: 6108 - Set V1 = 8
-95: 235f - Call subroutine at 35f
-96: 8106 - Set V1 = V1x SHR 1.
-97: 235f - Call subroutine at 35f
-98: 8106 - Set V1 = V1x SHR 1.
-99: 235f - Call subroutine at 35f
-9a: 8106 - Set V1 = V1x SHR 1.
-9b: 235f - Call subroutine at 35f
-9c: ffd0 - 
-9d: ffee - 
-9e: ffe0 - 
-9f: 8012 - Set V0 = V0 OR V1
-a0: 3000 - Skip next instruction if V0 = 0
-a1: ffc6 - 
-a2: 7b0c - Set Vb = b + c
-a3: ffee - 
-a4: ffcf - 
-a5: 601c - Set V0 = 1c
-a6: d804 - Display 4 - byte sprite starting at memory location I at
-(V8, V0), set VF = collision.
-a7: ffee - 
-a8: 2347 - Call subroutine at 347
-a9: 8e23 - Set Ve = Ve XOR V2
-aa: 2347 - Call subroutine at 347
-ab: 6005 - Set V0 = 5
-ac: f018 - Set sound timer = V0
-ad: f015 - Set delay timer = V0
-ae: f007 - Set V0 = delay timer value (the value of DT is placed into it).
-af: 3000 - Skip next instruction if V0 = 0
-b0: 137f - Jump to location 37f
-b1: ffee - 
-b2: 6a00 - Set Va = 0
-b3: ffe0 - 
-b4: 6b04 - Set Vb = 4
-b5: ffa1 - 
-b6: 1257 - Jump to location 257
-b7: a602 - Set I = 602
-b8: fd1e - Set I = I + Vd
-b9: f065 - Read registers V0 through V0 from memory starting at location I.
-ba: ffff - 
-bb: ffa5 - 
-bc: 6a00 - Set Va = 0
-bd: 6b04 - Set Vb = 4
-be: 6d01 - Set Vd = 1
-bf: 6e01 - Set Ve = 1
-c0: ff8d - 
-c1: a500 - Set I = 500
-c2: f01e - Set I = I + V0
-c3: ffc6 - 
-c4: 7b08 - Set Vb = b + 8
-c5: 7d01 - Set Vd = d + 1
-c6: 7a01 - Set Va = a + 1
-c7: 3a07 - Skip next instruction if Va = 7
-c8: ff8d - 
-c9: ffee - 
-ca: 3c7e - Skip next instruction if Vc = 7e
-cb: ffff - 
-cc: ff99 - 
-cd: ffff - 
-ce: ff24 - 
-cf: ffe7 - 
-d0: ffff - 
-d1: 3c3c - Skip next instruction if Vc = 3c
-d2: ffdb - 
-d3: 8142 - Set V1 = V1 OR V4
-d4: 3c7e - Skip next instruction if Vc = 7e
-d5: ffdb - 
-d6: 1038 - Jump to location 38
-d7: fffe - 
-d8: 0 - 
-d9: 7f00 - Set Vf = f + 0
-da: 3f00 - Skip next instruction if Vf = 0
-db: 7f00 - Set Vf = f + 0
-dc: 0 - 
-dd: 101 - 
-de: 103 - 
-df: 303 - 
-e0: 300 - 
-e1: 3f - 
-e2: 2020 - Call subroutine at 20
-e3: 2020 - Call subroutine at 20
-e4: 2020 - Call subroutine at 20
-e5: 2020 - Call subroutine at 20
-e6: 3f08 - Skip next instruction if Vf = 8
-e7: ffff - 
-e8: 0 - 
-e9: fe00 - 
-ea: fc00 - 
-eb: fe00 - 
-ec: 0 - 
-ed: 7e42 - Set Ve = e + 42
-ee: 4262 - Skip next instruction if V2 != 62
-ef: 6262 - Set V2 = 62
-f0: 6200 - Set V2 = 0
-f1: ffff - 
-f2: 0 - 
-f3: 0 - 
-f4: 0 - 
-f5: 0 - 
-f6: ff00 - 
-f7: ffff - 
-f8: 7d - 
-f9: 41 - 
-fa: 7d05 - Set Vd = d + 5
-fb: 7d7d - Set Vd = d + 7d
-fc: 0 - 
-fd: ffc2 - 
-fe: c644 - Set V6 = random byte AND 44
-ff: 6c28 - Set Vc = 28
-100: 3800 - Skip next instruction if V8 = 0
-101: ffff - 
-102: 0 - 
-103: 0 - 
-104: 0 - 
-105: 0 - 
-106: ff00 - 
-107: ffff - 
-108: fff7 - 
-109: 1014 - Jump to location 14
-10a: fff7 - 
-10b: 404 - 
-10c: 0 - 
-10d: 7c44 - Set Vc = c + 44
-10e: ffc2 - 
-10f: ffc2 - 
-110: c200 - Set V2 = random byte AND 0
-111: ffff - 
-112: 0 - 
-113: 0 - 
-114: 0 - 
-115: 0 - 
-116: ff00 - 
-117: ffff - 
-118: ffef - 
-119: 2028 - Call subroutine at 28
-11a: ffe8 - 
-11b: 2f2f - Call subroutine at f2f
-11c: 0 - 
-11d: ff85 - 
-11e: ffc5 - 
-11f: ffc5 - 
-120: f900 - 
-121: ffff - 
-122: 0 - 
-123: 0 - 
-124: 0 - 
-125: 0 - 
-126: ff00 - 
-127: ffff - 
-128: ffbe - 
-129: 20 - 
-12a: 3020 - Skip next instruction if V0 = 20
-12b: ffbe - 
-12c: 0 - 
-12d: f704 - 
-12e: ff85 - 
-12f: ff84 - 
-130: f400 - 
-131: ffff - 
-132: 0 - 
-133: 0 - 
-134: 0 - 
-135: 0 - 
-136: ff00 - 
-137: ffff - 
-138: 0 - 
-139: 7f00 - Set Vf = f + 0
-13a: 3f00 - Skip next instruction if Vf = 0
-13b: 7f00 - Set Vf = f + 0
-13c: 0 - 
-13d: ef28 - 
-13e: ef00 - 
-13f: e060 - 
-140: 6f00 - Set Vf = 0
-141: ffff - 
-142: 0 - 
-143: 0 - 
-144: 0 - 
-145: 0 - 
-146: ff00 - 
-147: ffff - 
-148: 0 - 
-149: fe00 - 
-14a: fc00 - 
-14b: fe00 - 
-14c: 0 - 
-14d: c000 - Set V0 = random byte AND 0
-14e: ffc0 - 
-14f: ffc0 - 
-150: c000 - Set V0 = random byte AND 0
-151: fffc - 
-152: 404 - 
-153: 404 - 
-154: 404 - 
-155: 404 - 
-156: fc10 - 
-157: ffff - 
-158: ff81 - 
-159: ff8b - 
-15a: ff9a - 
-15b: fa00 - 
-15c: ff8a - 
-15d: ff9a - 
-15e: ff99 - 
-15f: ffe6 - 
-160: 2525 - Call subroutine at 525
-161: f434 - 
-162: 3434 - Skip next instruction if V4 = 34
-163: 17 - 
-164: 1434 - Jump to location 434
-165: 3736 - Skip next instruction if V7 = 36
-166: ffc7 - 
-167: df50 - Display 0 - byte sprite starting at memory location I at
-(Vf, V5), set VF = collision.
-168: 505c - Skip next instruction if V0 = 5
-169: ffd8 - 
-16a: df00 - Display 0 - byte sprite starting at memory location I at
-(Vf, V0), set VF = collision.
-16b: df11 - Display 1 - byte sprite starting at memory location I at
-(Vf, V1), set VF = collision.
-16c: 1f12 - Jump to location f12
-16d: 1b19 - Jump to location b19
-16e: d97c - Display c - byte sprite starting at memory location I at
-(V9, V7), set VF = collision.
-16f: fffe - 
-170: ff86 - 
-171: fffc - 
-172: fffe - 
-173: ff82 - 
-174: fffe - 
-175: ffc0 - 
-176: ffc0 - 
-177: fffc - 
-178: ffc2 - 
-179: ffc2 - 
-17a: fffe - 
-17b: fff8 - 
-17c: ffc0 - 
-17d: fffe - 
-17e: fff0 - 
-17f: ffc0 - 
-180: fffe - 
-181: ffbe - 
-182: ff86 - 
-183: ff86 - 
-184: fffe - 
-185: ff86 - 
-186: 8610 - Set V6 = V1
-187: 1010 - Jump to location 10
-188: 1010 - Jump to location 10
-189: 1018 - Jump to location 18
-18a: 1818 - Jump to location 818
-18b: 4848 - Skip next instruction if V8 != 48
-18c: ff9c - 
-18d: ffb0 - 
-18e: ffb0 - 
-18f: ff80 - 
-190: ffc0 - 
-191: ffc0 - 
-192: ffee - 
-193: ff92 - 
-194: ff86 - 
-195: fffe - 
-196: ff86 - 
-197: ff86 - 
-198: 867c - 
-199: ff86 - 
-19a: ff86 - 
-19b: fffe - 
-19c: fffe - 
-19d: ffc0 - 
-19e: c07c - Set V0 = random byte AND 7c
-19f: ffc2 - 
-1a0: ffc4 - 
-1a1: fffe - 
-1a2: fffe - 
-1a3: ff9c - 
-1a4: fffe - 
-1a5: fffe - 
-1a6: 202 - 
-1a7: fffe - 
-1a8: 1030 - Jump to location 30
-1a9: 3030 - Skip next instruction if V0 = 30
-1aa: ff82 - 
-1ab: ffc2 - 
-1ac: ffc2 - 
-1ad: ff82 - 
-1ae: ff82 - 
-1af: ee38 - 
-1b0: ff86 - 
-1b1: ff96 - 
-1b2: ff92 - 
-1b3: ff82 - 
-1b4: 4438 - Skip next instruction if V4 != 38
-1b5: 3844 - Skip next instruction if V8 = 44
-1b6: ff82 - 
-1b7: fffe - 
-1b8: 3030 - Skip next instruction if V0 = 30
-1b9: fffe - 
-1ba: 21e - 
-1bb: ff80 - 
-1bc: fe00 - 
-1bd: 0 - 
-1be: 6 - 
-1bf: 600 - 
-1c0: 0 - 
-1c1: 6060 - Set V0 = 60
-1c2: c000 - Set V0 = random byte AND 0
-1c3: 0 - 
-1c4: 0 - 
-1c5: 18 - 
-1c6: 1818 - Jump to location 818
-1c7: 1800 - Jump to location 800
-1c8: 187c - Jump to location 87c
-1c9: c60c - Set V6 = random byte AND c
-1ca: 1800 - Jump to location 800
-1cb: 1800 - Jump to location 800
-1cc: fffe - 
-1cd: fe00 - 
-1ce: fffe - 
-1cf: ff86 - 
-1d0: ff86 - 
-1d1: fe08 - 
-1d2: 808 - 
-1d3: 1818 - Jump to location 818
-1d4: fffe - 
-1d5: fffe - 
-1d6: ffc0 - 
-1d7: fffe - 
-1d8: 21e - 
-1d9: 606 - 
-1da: ff84 - 
-1db: ffc4 - 
-1dc: fe04 - 
-1dd: fffe - 
-1de: fffe - 
-1df: 606 - 
-1e0: ffc0 - 
-1e1: ffc0 - 
-1e2: ff82 - 
-1e3: fffe - 
-1e4: 202 - 
-1e5: 606 - 
-1e6: 67c - 
-1e7: fffe - 
-1e8: ff86 - 
-1e9: fffe - 
-1ea: fffe - 
-1eb: 606 - 
-1ec: 644 - 
-1ed: fe44 - 
-1ee: fffe - 
-1ef: ffa8 - 
-1f0: ffa8 - 
-1f1: ffa8 - 
-1f2: ffa8 - 
-1f3: 6c5a - Set Vc = 5a
-1f4: c - 
-1f5: ffa8 - 
-1f6: 304e - Skip next instruction if V0 = 4e
-1f7: 7e00 - Set Ve = e + 0
-1f8: 1218 - Jump to location 218
-1f9: 666c - Set V6 = 6c
-1fa: a85a - Set I = 85a
-1fb: 6654 - Set V6 = 54
-1fc: 2466 - Call subroutine at 466
-1fd: 48 - 
-1fe: 4818 - Skip next instruction if V8 != 18
-1ff: ffa8 - 
-200: ff90 - 
-201: a812 - Set I = 812
-202: 7e - 
-203: 3012 - Skip next instruction if V0 = 12
-204: ff84 - 
-205: 304e - Skip next instruction if V0 = 4e
-206: 7218 - Set V2 = 2 + 18
-207: ffa8 - 
-208: ffa8 - 
-209: ffa8 - 
-20a: ff90 - 
-20b: 5478 - Skip next instruction if V4 = 7
-20c: a848 - Set I = 848
-20d: 786c - Set V8 = 8 + 6c
-20e: ffa8 - 
-20f: 1218 - Jump to location 218
-210: 6c72 - Set Vc = 72
-211: 6654 - Set V6 = 54
-212: ffa8 - 
-213: 722a - Set V2 = 2 + 2a
-214: ffa8 - 
-215: 304e - Skip next instruction if V0 = 4e
-216: 7e00 - Set Ve = e + 0
-217: 1218 - Jump to location 218
-218: 666c - Set V6 = 6c
-219: a872 - Set I = 872
-21a: ffa8 - 
-21b: 5a66 - Skip next instruction if Va = 6
-21c: 187e - Jump to location 87e
-21d: 184e - Jump to location 84e
-21e: ffa8 - 
-21f: 722a - Set V2 = 2 + 2a
-220: 1830 - Jump to location 830
-221: ffa8 - 
-222: 304e - Skip next instruction if V0 = 4e
-223: 7e00 - Set Ve = e + 0
-224: 6c30 - Set Vc = 30
-225: 544e - Skip next instruction if V4 = 4
-226: ffa8 - 
-227: ffa8 - 
-228: ffa8 - 
-229: ffa8 - 
-22a: 4854 - Skip next instruction if V8 != 54
-22b: 7e18 - Set Ve = e + 18
-22c: ff90 - 
-22d: 5478 - Skip next instruction if V4 = 7
-22e: ffa8 - 
-22f: 6c2a - Set Vc = 2a
-230: 305a - Skip next instruction if V0 = 5a
-231: ff84 - 
-232: 3072 - Skip next instruction if V0 = 72
-233: ffa8 - 
-234: ffa8 - 
-235: 4e - 
-236: ffa8 - 
-237: ffa2 - 
-238: a800 - Set I = 800
-239: 4e12 - Skip next instruction if Ve != 12
-23a: a86c - Set I = 86c
-23b: 2a54 - Call subroutine at a54
-23c: 5472 - Skip next instruction if V4 = 7
-23d: ff84 - 
-23e: 3072 - Skip next instruction if V0 = 72
-23f: ffa8 - 
-240: ff9c - 
-241: a872 - Set I = 872
-242: 2a18 - Call subroutine at a18
-243: a80c - Set I = 80c
-244: 5448 - Skip next instruction if V4 = 4
-245: 5a78 - Skip next instruction if Va = 7
-246: 7218 - Set V2 = 2 + 18
-247: ffa8 - 
-248: 7218 - Set V2 = 2 + 18
-249: 4242 - Skip next instruction if V2 != 42
-24a: ffa8 - 
-24b: 722a - Set V2 = 2 + 2a
-24c: 72 - 
-24d: a872 - Set I = 872
-24e: 2a18 - Call subroutine at a18
-24f: a830 - Set I = 830
-250: 4e7e - Skip next instruction if Ve != 7e
-251: 12 - 
-252: 1866 - Jump to location 866
-253: ffa8 - 
-254: 304e - Skip next instruction if V0 = 4e
-255: c66 - 
-256: 1800 - Jump to location 800
-257: 6c18 - Set Vc = 18
-258: a872 - Set I = 872
-259: 2a18 - Call subroutine at a18
-25a: 3066 - Skip next instruction if V0 = 66
-25b: a81e - Set I = 81e
-25c: 5466 - Skip next instruction if V4 = 6
-25d: c18 - 
-25e: ffa8 - 
-25f: 2454 - Call subroutine at 454
-260: 5412 - Skip next instruction if V4 = 1
-261: a842 - Set I = 842
-262: 780c - Set V8 = 8 + c
-263: ffa8 - 
-264: ffa8 - 
-265: ffa8 - 
-266: ffa8 - 
-267: ffa8 - 
-268: ff00 - 
-269: 0 - 
-26a: 0 - 
-26b: 0 - 
-26c: 0 - 
-26d: 0 - 
-26e: 0 - 
-26f: 0 - 
+ADDRESS    OPCODE     MNEMONIC
+0200       1225       JP 225
+0225       6000       LD V0, 0
+0227       6100       LD V1, 0
+0229       6208       LD V2, 8
+022b       ffd3       
+022d       d018       DRW V0, V1, 8
+022f       7108       ADD V1, 8
+0231       f21e       ADD I, V2
+0233       3120       SE V1, 20
+0235       122d       JP 22d
+0237       7008       ADD V0, 8
+0239       6100       LD V1, 0
+023b       3040       SE V0, 40
+023d       122d       JP 22d
+023f       6905       LD V9, 5
+0241       6c15       LD Vc, 15
+0243       6e00       LD Ve, 0
+0245       ff87       
+0247       600a       LD V0, a
+0249       f015       LD DT, V0
+024b       f007       LD V0, DT
+024d       3000       SE V0, 0
+024f       124b       JP 24b
+0251       ff87       
+0253       7e01       ADD Ve, 1
+0255       1245       JP 245
+0257       6600       LD V6, 0
+0259       681c       LD V8, 1c
+025b       6900       LD V9, 0
+025d       6a04       LD Va, 4
+025f       6b0a       LD Vb, a
+0261       6c04       LD Vc, 4
+0263       6d3c       LD Vd, 3c
+0265       6e0f       LD Ve, f
+0267       ffe0       
+0269       236b       CALL 36b
+026b       2347       CALL 347
+026d       fd15       LD DT, Vd
+026f       6004       LD V0, 4
+0271       ff9e       
+0273       127d       JP 27d
+0275       236b       CALL 36b
+0277       3800       SE V8, 0
+0279       ffff       
+027b       236b       CALL 36b
+027d       6006       LD V0, 6
+027f       ff9e       
+0281       ff8b       
+0283       236b       CALL 36b
+0285       3839       SE V8, 39
+0287       7801       ADD V8, 1
+0289       236b       CALL 36b
+028b       3600       SE V6, 0
+028d       ff9f       
+028f       6005       LD V0, 5
+0291       ff9e       
+0293       ffe9       
+0295       6601       LD V6, 1
+0297       651b       LD V5, 1b
+0299       ff80       
+029b       ffcf       
+029d       d451       DRW V4, V5, 1
+029f       ffcf       
+02a1       d451       DRW V4, V5, 1
+02a3       ffff       
+02a5       ffff       
+02a7       ffad       
+02a9       6600       LD V6, 0
+02ab       ffe9       
+02ad       d451       DRW V4, V5, 1
+02af       3f01       SE Vf, 1
+02b1       ffe9       
+02b3       d451       DRW V4, V5, 1
+02b5       6600       LD V6, 0
+02b7       8340       LD V3, V4
+02b9       7303       ADD V3, 3
+02bb       ffb5       
+02bd       fff8       
+02bf       8322       AND V3, V2
+02c1       6208       LD V2, 8
+02c3       3300       SE V3, 0
+02c5       ffc9       
+02c7       2373       CALL 373
+02c9       8206       SHR V2{ , V0 }
+02cb       4308       SNE V3, 8
+02cd       ffd3       
+02cf       3310       SE V3, 10
+02d1       ffd5       
+02d3       2373       CALL 373
+02d5       8206       SHR V2{ , V0 }
+02d7       3318       SE V3, 18
+02d9       ffdd       
+02db       2373       CALL 373
+02dd       8206       SHR V2{ , V0 }
+02df       4320       SNE V3, 20
+02e1       ffe7       
+02e3       3328       SE V3, 28
+02e5       ffe9       
+02e7       2373       CALL 373
+02e9       3e00       SE Ve, 0
+02eb       1307       JP 307
+02ed       7906       ADD V9, 6
+02ef       4918       SNE V9, 18
+02f1       6900       LD V9, 0
+02f3       6a04       LD Va, 4
+02f5       6b0a       LD Vb, a
+02f7       6c04       LD Vc, 4
+02f9       fff4       
+02fb       6e0f       LD Ve, f
+02fd       ffe0       
+02ff       2347       CALL 347
+0301       236b       CALL 36b
+0303       fd15       LD DT, Vd
+0305       126f       JP 26f
+0307       f707       LD V7, DT
+0309       3700       SE V7, 0
+030b       126f       JP 26f
+030d       fd15       LD DT, Vd
+030f       2347       CALL 347
+0311       ffa4       
+0313       3b12       SE Vb, 12
+0315       131b       JP 31b
+0317       7c02       ADD Vc, 2
+0319       fffc       
+031b       3b02       SE Vb, 2
+031d       1323       JP 323
+031f       7c02       ADD Vc, 2
+0321       6a04       LD Va, 4
+0323       2347       CALL 347
+0325       3c18       SE Vc, 18
+0327       126f       JP 26f
+0329       ffe0       
+032b       ffd3       
+032d       6014       LD V0, 14
+032f       6108       LD V1, 8
+0331       620f       LD V2, f
+0333       d01f       DRW V0, V1, f
+0335       7008       ADD V0, 8
+0337       f21e       ADD I, V2
+0339       302c       SE V0, 2c
+033b       1333       JP 333
+033d       f00a       LD V0, K
+033f       ffe0       
+0341       fff4       
+0343       fe65       LD Ve, [I]
+0345       1225       JP 225
+0347       ffb7       
+0349       f91e       ADD I, V9
+034b       6108       LD V1, 8
+034d       235f       CALL 35f
+034f       8106       SHR V1{ , V0 }
+0351       235f       CALL 35f
+0353       8106       SHR V1{ , V0 }
+0355       235f       CALL 35f
+0357       8106       SHR V1{ , V0 }
+0359       235f       CALL 35f
+035b       ffd0       
+035d       ffee       
+035f       ffe0       
+0361       8012       AND V0, V1
+0363       3000       SE V0, 0
+0365       ffc6       
+0367       7b0c       ADD Vb, c
+0369       ffee       
+036b       ffcf       
+036d       601c       LD V0, 1c
+036f       d804       DRW V8, V0, 4
+0371       ffee       
+0373       2347       CALL 347
+0375       8e23       XOR Ve, V2
+0377       2347       CALL 347
+0379       6005       LD V0, 5
+037b       f018       LD ST, V0
+037d       f015       LD DT, V0
+037f       f007       LD V0, DT
+0381       3000       SE V0, 0
+0383       137f       JP 37f
+0385       ffee       
+0387       6a00       LD Va, 0
+0389       ffe0       
+038b       6b04       LD Vb, 4
+038d       ffa1       
+038f       1257       JP 257
+0391       a602       LD I, 602
+0393       fd1e       ADD I, Vd
+0395       f065       LD V0, [I]
+0397       ffff       
+0399       ffa5       
+039b       6a00       LD Va, 0
+039d       6b04       LD Vb, 4
+039f       6d01       LD Vd, 1
+03a1       6e01       LD Ve, 1
+03a3       ff8d       
+03a5       a500       LD I, 500
+03a7       f01e       ADD I, V0
+03a9       ffc6       
+03ab       7b08       ADD Vb, 8
+03ad       7d01       ADD Vd, 1
+03af       7a01       ADD Va, 1
+03b1       3a07       SE Va, 7
+03b3       ff8d       
+03b5       ffee       
+03b7       3c7e       SE Vc, 7e
+03b9       ffff       
+03bb       ff99       
+03bd       ffff       
+03bf       ff24       
+03c1       ffe7       
+03c3       ffff       
+03c5       3c3c       SE Vc, 3c
+03c7       ffdb       
+03c9       8142       AND V1, V4
+03cb       3c7e       SE Vc, 7e
+03cd       ffdb       
+03cf       1038       JP 038
+03d1       fffe       
+03d3       0000       
+03d5       7f00       ADD Vf, 0
+03d7       3f00       SE Vf, 0
+03d9       7f00       ADD Vf, 0
+03db       0000       
+03dd       0101       
+03df       0103       
+03e1       0303       
+03e3       0300       
+03e5       003f       
+03e7       2020       CALL 020
+03e9       2020       CALL 020
+03eb       2020       CALL 020
+03ed       2020       CALL 020
+03ef       3f08       SE Vf, 8
+03f1       ffff       
+03f3       0000       
+03f5       fe00       
+03f7       fc00       
+03f9       fe00       
+03fb       0000       
+03fd       7e42       ADD Ve, 42
+03ff       4262       SNE V2, 62
+0401       6262       LD V2, 62
+0403       6200       LD V2, 0
+0405       ffff       
+0407       0000       
+0409       0000       
+040b       0000       
+040d       0000       
+040f       ff00       
+0411       ffff       
+0413       007d       
+0415       0041       
+0417       7d05       ADD Vd, 5
+0419       7d7d       ADD Vd, 7d
+041b       0000       
+041d       ffc2       
+041f       c644       RND V6, 44
+0421       6c28       LD Vc, 28
+0423       3800       SE V8, 0
+0425       ffff       
+0427       0000       
+0429       0000       
+042b       0000       
+042d       0000       
+042f       ff00       
+0431       ffff       
+0433       fff7       
+0435       1014       JP 014
+0437       fff7       
+0439       0404       
+043b       0000       
+043d       7c44       ADD Vc, 44
+043f       ffc2       
+0441       ffc2       
+0443       c200       RND V2, 0
+0445       ffff       
+0447       0000       
+0449       0000       
+044b       0000       
+044d       0000       
+044f       ff00       
+0451       ffff       
+0453       ffef       
+0455       2028       CALL 028
+0457       ffe8       
+0459       2f2f       CALL f2f
+045b       0000       
+045d       ff85       
+045f       ffc5       
+0461       ffc5       
+0463       f900       
+0465       ffff       
+0467       0000       
+0469       0000       
+046b       0000       
+046d       0000       
+046f       ff00       
+0471       ffff       
+0473       ffbe       
+0475       0020       
+0477       3020       SE V0, 20
+0479       ffbe       
+047b       0000       
+047d       f704       
+047f       ff85       
+0481       ff84       
+0483       f400       
+0485       ffff       
+0487       0000       
+0489       0000       
+048b       0000       
+048d       0000       
+048f       ff00       
+0491       ffff       
+0493       0000       
+0495       7f00       ADD Vf, 0
+0497       3f00       SE Vf, 0
+0499       7f00       ADD Vf, 0
+049b       0000       
+049d       ef28       
+049f       ef00       
+04a1       e060       
+04a3       6f00       LD Vf, 0
+04a5       ffff       
+04a7       0000       
+04a9       0000       
+04ab       0000       
+04ad       0000       
+04af       ff00       
+04b1       ffff       
+04b3       0000       
+04b5       fe00       
+04b7       fc00       
+04b9       fe00       
+04bb       0000       
+04bd       c000       RND V0, 0
+04bf       ffc0       
+04c1       ffc0       
+04c3       c000       RND V0, 0
+04c5       fffc       
+04c7       0404       
+04c9       0404       
+04cb       0404       
+04cd       0404       
+04cf       fc10       
+04d1       ffff       
+04d3       ff81       
+04d5       ff8b       
+04d7       ff9a       
+04d9       fa00       
+04db       ff8a       
+04dd       ff9a       
+04df       ff99       
+04e1       ffe6       
+04e3       2525       CALL 525
+04e5       f434       
+04e7       3434       SE V4, 34
+04e9       0017       
+04eb       1434       JP 434
+04ed       3736       SE V7, 36
+04ef       ffc7       
+04f1       df50       DRW Vf, V5, 0
+04f3       505c       SE V0, V5
+04f5       ffd8       
+04f7       df00       DRW Vf, V0, 0
+04f9       df11       DRW Vf, V1, 1
+04fb       1f12       JP f12
+04fd       1b19       JP b19
+04ff       d97c       DRW V9, V7, c
+0501       fffe       
+0503       ff86       
+0505       fffc       
+0507       fffe       
+0509       ff82       
+050b       fffe       
+050d       ffc0       
+050f       ffc0       
+0511       fffc       
+0513       ffc2       
+0515       ffc2       
+0517       fffe       
+0519       fff8       
+051b       ffc0       
+051d       fffe       
+051f       fff0       
+0521       ffc0       
+0523       fffe       
+0525       ffbe       
+0527       ff86       
+0529       ff86       
+052b       fffe       
+052d       ff86       
+052f       8610       LD V6, V1
+0531       1010       JP 010
+0533       1010       JP 010
+0535       1018       JP 018
+0537       1818       JP 818
+0539       4848       SNE V8, 48
+053b       ff9c       
+053d       ffb0       
+053f       ffb0       
+0541       ff80       
+0543       ffc0       
+0545       ffc0       
+0547       ffee       
+0549       ff92       
+054b       ff86       
+054d       fffe       
+054f       ff86       
+0551       ff86       
+0553       867c       
+0555       ff86       
+0557       ff86       
+0559       fffe       
+055b       fffe       
+055d       ffc0       
+055f       c07c       RND V0, 7c
+0561       ffc2       
+0563       ffc4       
+0565       fffe       
+0567       fffe       
+0569       ff9c       
+056b       fffe       
+056d       fffe       
+056f       0202       
+0571       fffe       
+0573       1030       JP 030
+0575       3030       SE V0, 30
+0577       ff82       
+0579       ffc2       
+057b       ffc2       
+057d       ff82       
+057f       ff82       
+0581       ee38       
+0583       ff86       
+0585       ff96       
+0587       ff92       
+0589       ff82       
+058b       4438       SNE V4, 38
+058d       3844       SE V8, 44
+058f       ff82       
+0591       fffe       
+0593       3030       SE V0, 30
+0595       fffe       
+0597       021e       
+0599       ff80       
+059b       fe00       
+059d       0000       
+059f       0006       
+05a1       0600       
+05a3       0000       
+05a5       6060       LD V0, 60
+05a7       c000       RND V0, 0
+05a9       0000       
+05ab       0000       
+05ad       0018       
+05af       1818       JP 818
+05b1       1800       JP 800
+05b3       187c       JP 87c
+05b5       c60c       RND V6, c
+05b7       1800       JP 800
+05b9       1800       JP 800
+05bb       fffe       
+05bd       fe00       
+05bf       fffe       
+05c1       ff86       
+05c3       ff86       
+05c5       fe08       
+05c7       0808       
+05c9       1818       JP 818
+05cb       fffe       
+05cd       fffe       
+05cf       ffc0       
+05d1       fffe       
+05d3       021e       
+05d5       0606       
+05d7       ff84       
+05d9       ffc4       
+05db       fe04       
+05dd       fffe       
+05df       fffe       
+05e1       0606       
+05e3       ffc0       
+05e5       ffc0       
+05e7       ff82       
+05e9       fffe       
+05eb       0202       
+05ed       0606       
+05ef       067c       
+05f1       fffe       
+05f3       ff86       
+05f5       fffe       
+05f7       fffe       
+05f9       0606       
+05fb       0644       
+05fd       fe44       
+05ff       fffe       
+0601       ffa8       
+0603       ffa8       
+0605       ffa8       
+0607       ffa8       
+0609       6c5a       LD Vc, 5a
+060b       000c       
+060d       ffa8       
+060f       304e       SE V0, 4e
+0611       7e00       ADD Ve, 0
+0613       1218       JP 218
+0615       666c       LD V6, 6c
+0617       a85a       LD I, 85a
+0619       6654       LD V6, 54
+061b       2466       CALL 466
+061d       0048       
+061f       4818       SNE V8, 18
+0621       ffa8       
+0623       ff90       
+0625       a812       LD I, 812
+0627       007e       
+0629       3012       SE V0, 12
+062b       ff84       
+062d       304e       SE V0, 4e
+062f       7218       ADD V2, 18
+0631       ffa8       
+0633       ffa8       
+0635       ffa8       
+0637       ff90       
+0639       5478       SE V4, V7
+063b       a848       LD I, 848
+063d       786c       ADD V8, 6c
+063f       ffa8       
+0641       1218       JP 218
+0643       6c72       LD Vc, 72
+0645       6654       LD V6, 54
+0647       ffa8       
+0649       722a       ADD V2, 2a
+064b       ffa8       
+064d       304e       SE V0, 4e
+064f       7e00       ADD Ve, 0
+0651       1218       JP 218
+0653       666c       LD V6, 6c
+0655       a872       LD I, 872
+0657       ffa8       
+0659       5a66       SE Va, V6
+065b       187e       JP 87e
+065d       184e       JP 84e
+065f       ffa8       
+0661       722a       ADD V2, 2a
+0663       1830       JP 830
+0665       ffa8       
+0667       304e       SE V0, 4e
+0669       7e00       ADD Ve, 0
+066b       6c30       LD Vc, 30
+066d       544e       SE V4, V4
+066f       ffa8       
+0671       ffa8       
+0673       ffa8       
+0675       ffa8       
+0677       4854       SNE V8, 54
+0679       7e18       ADD Ve, 18
+067b       ff90       
+067d       5478       SE V4, V7
+067f       ffa8       
+0681       6c2a       LD Vc, 2a
+0683       305a       SE V0, 5a
+0685       ff84       
+0687       3072       SE V0, 72
+0689       ffa8       
+068b       ffa8       
+068d       004e       
+068f       ffa8       
+0691       ffa2       
+0693       a800       LD I, 800
+0695       4e12       SNE Ve, 12
+0697       a86c       LD I, 86c
+0699       2a54       CALL a54
+069b       5472       SE V4, V7
+069d       ff84       
+069f       3072       SE V0, 72
+06a1       ffa8       
+06a3       ff9c       
+06a5       a872       LD I, 872
+06a7       2a18       CALL a18
+06a9       a80c       LD I, 80c
+06ab       5448       SE V4, V4
+06ad       5a78       SE Va, V7
+06af       7218       ADD V2, 18
+06b1       ffa8       
+06b3       7218       ADD V2, 18
+06b5       4242       SNE V2, 42
+06b7       ffa8       
+06b9       722a       ADD V2, 2a
+06bb       0072       
+06bd       a872       LD I, 872
+06bf       2a18       CALL a18
+06c1       a830       LD I, 830
+06c3       4e7e       SNE Ve, 7e
+06c5       0012       
+06c7       1866       JP 866
+06c9       ffa8       
+06cb       304e       SE V0, 4e
+06cd       0c66       
+06cf       1800       JP 800
+06d1       6c18       LD Vc, 18
+06d3       a872       LD I, 872
+06d5       2a18       CALL a18
+06d7       3066       SE V0, 66
+06d9       a81e       LD I, 81e
+06db       5466       SE V4, V6
+06dd       0c18       
+06df       ffa8       
+06e1       2454       CALL 454
+06e3       5412       SE V4, V1
+06e5       a842       LD I, 842
+06e7       780c       ADD V8, c
+06e9       ffa8       
+06eb       ffa8       
+06ed       ffa8       
+06ef       ffa8       
+06f1       ffa8       
+06f3       ff00       
+06f5       0000       
+06f7       0000       
+06f9       0000       
+06fb       0000       
+06fd       0000       
+06ff       0000       
+0701       0000       

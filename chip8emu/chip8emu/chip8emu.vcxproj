@@ -79,6 +79,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Types.h" />
     <ClInclude Include="myCPU.h" />
     <ClInclude Include="Stack.h" />
     <ClInclude Include="stdafx.h" />
