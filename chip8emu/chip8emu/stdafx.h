@@ -2,6 +2,7 @@
 // or project specific include files that are used frequently, but
 // are changed infrequently
 //
+// Author   : Lauren Rush
 
 #pragma once
 
@@ -9,12 +10,6 @@
 
 #include <stdio.h>
 #include <tchar.h>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <iomanip>
-using namespace std;
-
-
+#include "myCPU.h"
 
 // TODO: reference additional headers your program requires here
