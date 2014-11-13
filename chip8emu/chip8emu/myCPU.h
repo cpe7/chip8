@@ -17,19 +17,26 @@ public:
 	myCPU();
 	~myCPU();
 
+	bool loadROM();
 	void dissassemble();
+	void emulator();
+
+	short lengthROM16; // 16-bit words length
+	short lengthROM8;  // byte length
 	
 	///////////////////////////////////////////////////////////////////////////
 	// MEMORY MAP, per [3]
 	///////////////////////////////////////////////////////////////////////////
-	char rsvd[0x0200];     // 0x0000 - 0x01FF: Reserved for interpretter
-	char chip8ram[0x0DFF]; // 0x0200 - 0x0FFF: Program/Data RAM
+	char chip8ram8[0x0FFF];
+	short chip8ram[0x0800]; // 4096 bytes
+	                        // 0x0000 - 0x01FF: Reserved for interpretter
+	                        // 0x0200 - 0x0FFF: Program/Data RAM
 
 	///////////////////////////////////////////////////////////////////////////
 	// REGISTERS, per [3]
 	///////////////////////////////////////////////////////////////////////////
 	// - 16 general purpose 8-bit registers, Vx where x = 0 to F
-	char regVx[0xF];
+	short regVx[0xF];
 	// - I, 16-bit register stores memory addresses
 	short regI;
 	// - VF register used by instructions
