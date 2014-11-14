@@ -38,8 +38,10 @@ myCPU::myCPU()
 	regVF = 0x0;
 	// - DT (delay timer)
 	regDT = 0x0;
+	activeDT = false;
 	// - ST (sound timer)
 	regST = 0x0;
+	activeST = false;
 	// - PC (program counter)
 	regPC = 0x00;
 	// - SP (stack pointer)
@@ -874,6 +876,8 @@ void myCPU::emulator()
 		else if ((inst & 0xF0FF) == 0xF015)
 		{
 			regDT = (char)regVx[((0x0F00 & inst) >> 8)];
+			if (regDT > 0)
+				activeDT = true;
 			regPC += 2;
 			i = regPC;
 		}
@@ -885,7 +889,17 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF018)
 		{
+			// The sound timer is active whenever the sound timer register
+			// (ST)is non - zero.  This timer also decrements at a rate of 
+			// 60Hz, however, as long as ST's value is greater than zero,
+			// the Chip-8 buzzer will sound. When ST reaches zero, the 
+			// sound timer deactivates.
+			// The sound produced by the Chip - 8 interpreter has only one 
+			// tone.  The frequency of this tone is decided by the author 
+			//  of the interpreter.
 			regST = (char)regVx[((0x0F00 & inst) >> 8)];
+			if (regST > 0)
+				activeST = true;
 			regPC += 2;
 			i = regPC;
 		}
@@ -970,5 +984,6 @@ void myCPU::emulator()
 
 // TBD - delay timer register simulation
 // TBD - sound timer register simulation
+// http://cboard.cprogramming.com/cplusplus-programming/52392-producing-beep-sound-cplusplus.html
 // TBD - Display 
 // TBD - keyboard

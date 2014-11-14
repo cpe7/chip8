@@ -43,8 +43,10 @@ public:
 	char regVF;
 	// - DT (delay timer)
 	char regDT;
+	bool activeDT;
 	// - ST (sound timer)
 	char regST;
+	bool activeST;
 	// - PC (program counter)
 	short regPC;
 	// - SP (stack pointer)
