@@ -17,7 +17,7 @@ public:
 	myCPU();
 	~myCPU();
 
-	bool loadROM();
+	bool loadROM(string filename);
 	void dissassemble();
 	void emulator();
 

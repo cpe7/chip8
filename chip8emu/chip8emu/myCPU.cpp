@@ -54,7 +54,7 @@ myCPU::myCPU()
 // Method:  myCPU::loadROM()
 // Purpose: Save ROM to RAM
 ///////////////////////////////////////////////////////////////////////////////
-bool myCPU::loadROM()
+bool myCPU::loadROM(string filename)
 {
 	short msb = 0;
 	short lsb = 0;
@@ -64,7 +64,8 @@ bool myCPU::loadROM()
 	short j = 0x0200; // Start at offset 0x0200, byte offset
 
 	// Open binary file [1]
-	myROM.open(("..\\Debug\\INVADERS"), ios::binary);
+//	myROM.open(("..\\Debug\\INVADERS"), ios::binary);
+	myROM.open("..\\Debug\\"+filename, ios::binary);
 
 	// File is valid, verify it has been successfully opened...
 	if (myROM.is_open())
