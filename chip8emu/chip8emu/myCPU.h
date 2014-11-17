@@ -18,7 +18,6 @@ public:
 	~myCPU();
 
 	bool loadROM(string filename);
-	void dissassemble();
 	void emulator();
 
 	short lengthROM16; // 16-bit words length

@@ -7,13 +7,14 @@
 int main(int argc, char *argv[])
 {
 	myCPU chip8;
+	CUtility parseROM;
 
 	if (argc == 2)
 	{
 		cout << "You've selected: " << argv[1] << endl; // [1]
 		if (chip8.loadROM(argv[1]))  // [1]
 		{
-			chip8.dissassemble();
+			parseROM.dissassemble(chip8.chip8ram, chip8.lengthROM16);
 	//		chip8.emulator();
 		}
 	}
