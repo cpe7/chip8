@@ -25,14 +25,14 @@ void CUtility::dissassemble(short const * chip8ram, short const lengthROM16)
 
 	// Create output file for source assembly listing...
 	myDIS.open("output.s");
-	myDIS << "ADDRESS    OPCODE     MNEMONIC\n";
+	myDIS << "ADDRESS (WORD)     ADDRESS (BYTE)    OPCODE     MNEMONIC\n";
 
 	// Start parsing through ROM
 	// starting at address 0x0100 (or 0x0200 byte offset) for Program Memory
 	for (short i = 0x0100; i < lengthROM16; i++)
 	{
 		// Parse address, opcode, mnemonic... [4]
-		myDIS << hex << setw(4) << setfill('0') << i << "       "
+		myDIS << hex << setw(4) << setfill('0') << i << "               " << (i * 2) << "               "
 			<< setw(4) << setfill('0') << chip8ram[i] << "       ";
 
 		//*****************************************************************
