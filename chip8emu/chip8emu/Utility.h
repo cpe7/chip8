@@ -2,7 +2,8 @@
 // Author   : Lauren Rush
 
 #pragma once
-
+#include <windows.h>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -12,9 +13,13 @@ using namespace std;
 class CUtility
 {
 public:
+	unsigned int lastTick;
+
 	CUtility();
 	~CUtility();
 
+	void initTime();
 	void dissassemble(short const * chip8ram, short const lengthROM16);
+	void handleTimers(char &rST, char &rDT);
 };
 

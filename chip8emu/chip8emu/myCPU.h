@@ -5,11 +5,7 @@
 #pragma once
 
 #include "Stack.h"
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <iomanip>
-using namespace std;
+#include "Utility.h"
 
 class myCPU
 {
@@ -22,6 +18,8 @@ public:
 
 	short lengthROM16; // 16-bit words length
 	short lengthROM8;  // byte length
+
+	CUtility mytimer;
 	
 	///////////////////////////////////////////////////////////////////////////
 	// MEMORY MAP, per [3]
@@ -42,10 +40,8 @@ public:
 	char regVF;
 	// - DT (delay timer)
 	char regDT;
-	bool activeDT;
 	// - ST (sound timer)
 	char regST;
-	bool activeST;
 	// - PC (program counter)
 	short regPC;
 	// - SP (stack pointer)

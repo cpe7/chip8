@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 		if (chip8.loadROM(argv[1]))  // [1]
 		{
 			parseROM.dissassemble(chip8.chip8ram, chip8.lengthROM16);
-	//		chip8.emulator();
+			chip8.emulator();
 		}
 	}
 	else

@@ -5,13 +5,73 @@
 
 #include "Utility.h"
 
+///////////////////////////////////////////////////////////////////////////////
+// Method:  CUtility::CUtility()
+// Purpose: Constructor
+///////////////////////////////////////////////////////////////////////////////
 CUtility::CUtility()
 {
 }
 
-
+///////////////////////////////////////////////////////////////////////////////
+// Method:  CUtility::~CUtility()
+// Purpose: Destructor
+///////////////////////////////////////////////////////////////////////////////
 CUtility::~CUtility()
 {
+}
+
+void CUtility::initTime()
+{
+	// SYSTEMTIME
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/ms724950(v=vs.85).aspx
+	SYSTEMTIME systime;
+	GetSystemTime(&systime);
+
+	// Initialize time
+	lastTick = ((((systime.wHour * 3600) + (systime.wMinute * 60) + systime.wSecond) * 1000) + systime.wMilliseconds);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Method:  CUtility::handleTimers()
+// Purpose: Check timing to decrement timers at 60Hz
+// The following method is adapted from emulator101.com handleTimers function:
+// http://www.emulator101.com.s3-website-us-east-1.amazonaws.com/chip-8-port-pt-2-machine-object/ 
+///////////////////////////////////////////////////////////////////////////////
+void CUtility::handleTimers(char &rST, char &rDT)
+{
+	unsigned int now = 0;
+
+	// SYSTEMTIME
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/ms724950(v=vs.85).aspx
+	SYSTEMTIME systime;
+	GetSystemTime(&systime);
+
+	// Convert current System Time to msec
+	now = ((((systime.wHour * 3600) + (systime.wMinute * 60) + systime.wSecond) * 1000) + systime.wMilliseconds);
+
+	//Decrement the timers if 16 msec or more has gone by...
+	if (now - lastTick > 16) //1/60Hz, or 16.667ms
+	{
+		//Determine how many ticks have passed
+		unsigned int tickspast = now - lastTick;
+		tickspast /= 16;
+
+		if (rST > 0)
+		{
+			// if ST register is greater than tickspast, subtract tickspast, else subtract rST
+			// http://www.cplusplus.com/articles/1AUq5Di1/
+			rST = rST - (((unsigned int)rST > tickspast) ? tickspast : rST);
+			// Beep()
+		}
+		if (rDT > 0)
+		{
+			// if DT register is greater than tickspast, subtract tickspast, else subtract rDT
+			// http://www.cplusplus.com/articles/1AUq5Di1/
+			rDT = rDT - (((unsigned int)rDT > tickspast) ? tickspast : rDT);
+		}
+		lastTick = now;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////

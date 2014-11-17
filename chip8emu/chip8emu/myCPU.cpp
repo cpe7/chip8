@@ -38,10 +38,8 @@ myCPU::myCPU()
 	regVF = 0x0;
 	// - DT (delay timer)
 	regDT = 0x0;
-	activeDT = false;
 	// - ST (sound timer)
 	regST = 0x0;
-	activeST = false;
 	// - PC (program counter)
 	regPC = 0x00;
 	// - SP (stack pointer)
@@ -119,6 +117,8 @@ void myCPU::emulator()
 	short inst = 0;
 	
 	cout << "Press CTRL+c to exit...\n";
+
+	mytimer.initTime(); // Initialize my timer for Timer Registers...
 
 	// Process ROM OpCodes...
 	// starting at address 0x0100 (or 0x0200 byte offset) for Program Memory
@@ -542,8 +542,6 @@ void myCPU::emulator()
 		else if ((inst & 0xF0FF) == 0xF015)
 		{
 			regDT = (char)regVx[((0x0F00 & inst) >> 8)];
-			if (regDT > 0)
-				activeDT = true;
 			regPC += 2;
 			i = regPC;
 		}
@@ -564,8 +562,6 @@ void myCPU::emulator()
 			// tone.  The frequency of this tone is decided by the author 
 			//  of the interpreter.
 			regST = (char)regVx[((0x0F00 & inst) >> 8)];
-			if (regST > 0)
-				activeST = true;
 			regPC += 2;
 			i = regPC;
 		}
@@ -644,12 +640,11 @@ void myCPU::emulator()
 			regPC += 2;
 			i = regPC;
 		}
+
+		// Check on the timer registers ....
+		mytimer.handleTimers(regST, regDT);
 	}
 }
 
-
-// TBD - delay timer register simulation
-// TBD - sound timer register simulation
-// http://cboard.cprogramming.com/cplusplus-programming/52392-producing-beep-sound-cplusplus.html
 // TBD - Display 
 // TBD - keyboard
