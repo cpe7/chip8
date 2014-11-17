@@ -27,6 +27,12 @@ myCPU::myCPU()
 	memset(chip8ram, 0x00, 0x0FFF);
 	lengthROM16 = 0;
 	lengthROM8 = 0;
+
+	drawFlag = false;
+
+	for (unsigned int i = 0; i < 16; i++)
+		key[i] = 0; // not pressed
+
 	///////////////////////////////////////////////////////////////////////////
 	// REGISTERS, per [3]
 	///////////////////////////////////////////////////////////////////////////
@@ -119,7 +125,7 @@ void myCPU::emulator()
 	cout << "Press CTRL+c to exit...\n";
 
 	mytimer.initTime(); // Initialize my timer for Timer Registers...
-
+	
 	// Process ROM OpCodes...
 	// starting at address 0x0100 (or 0x0200 byte offset) for Program Memory
 	for (short i = 0x0200; i < lengthROM8;)
@@ -645,6 +651,3 @@ void myCPU::emulator()
 		mytimer.handleTimers(regST, regDT);
 	}
 }
-
-// TBD - Display 
-// TBD - keyboard
