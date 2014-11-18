@@ -28,7 +28,8 @@ myCPU::myCPU()
 	lengthROM16 = 0;
 	lengthROM8 = 0;
 
-	drawFlag = false;
+	drawFlag = true;
+	memset(gfx, 0, 2048);
 
 	for (unsigned int i = 0; i < 16; i++)
 		key[i] = 0; // not pressed
@@ -153,7 +154,8 @@ void myCPU::emulator()
 		//*****************************************************************
 		if (inst == 0x00E0)
 		{
-			// TBD
+			// drawFlag = false;
+			memset(gfx, 0, 2048);
 			regPC += 2;
 			i = regPC;
 		}
@@ -475,12 +477,17 @@ void myCPU::emulator()
 		
 		//*****************************************************************
 		// (24)	Dxyn - DRW Vx, Vy, nibble
-		//	Display n - byte sprite starting at memory location I at(Vx, Vy), set VF = collision.
-		//	The interpreter reads n bytes from memory, starting at the address stored in I.
-		//  These bytes are then displayed as sprites on screen at coordinates(Vx, Vy).
-		//  Sprites are XORed onto the existing screen.  If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. 
-		//  If the sprite is positioned so part of it is outside the coordinates of the display, it wraps around to the opposite side of the screen.
-		//  See instruction 8xy3 for more information on XOR, and section 2.4, Display, for more information on the Chip - 8 screen and sprites.
+		//	(1) Display n - byte sprite starting at memory location I 
+		//  at(Vx, Vy), set VF = collision.
+		//	(2) The interpreter reads n bytes from memory, starting at the 
+		//  address stored in I.
+		//  (3) These bytes are then displayed as sprites on screen at coordinates(Vx, Vy).
+		//  (4) Sprites are XORed onto the existing screen.  
+		//  If this causes any pixels to be erased, VF is set to 1, otherwise it is set to 0. 
+		//  If the sprite is positioned so part of it is outside the 
+		//  coordinates of the display, it wraps around to the opposite side of the screen.
+		//  See instruction 8xy3 for more information on XOR, and section 2.4, 
+		//  Display, for more information on the Chip - 8 screen and sprites.
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0xD000)
 		{
@@ -497,8 +504,14 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0xE09E)
 		{
-			// TBD
-			regPC += 2;
+			if (key[(0x0F00 >> 8)] == 1) // Key pressed
+			{
+				regPC += 4;
+			}
+			else
+			{
+				regPC += 2;
+			}
 			i = regPC;
 		}
 
@@ -510,8 +523,14 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xE0A1)
 		{
-			// TBD
-			regPC += 2;
+			if (key[(0x0F00 >> 8)] == 0) // Key NOT pressed
+			{
+				regPC += 4;
+			}
+			else
+			{
+				regPC += 2;
+			}
 			i = regPC;
 		}
 
@@ -587,8 +606,8 @@ void myCPU::emulator()
 		//*****************************************************************
 		// (32)	Fx29 - LD F, Vx
 		//	Set I = location of sprite for digit Vx.
-		//	The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx.
-		//   See section 2.4, Display, for more information on the Chip - 8 hexadecimal font.
+		//	The value of I is set to the location for the hexadecimal 
+		//  sprite corresponding to the value of Vx.
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF029)
 		{

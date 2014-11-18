@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 		glutInit(&argc, argv);
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
-		glutInitWindowSize(64, 32);
+		glutInitWindowSize(display_width, display_height);
 		glutInitWindowPosition(320, 320);
 		glutCreateWindow("myChip8 by Laurence Muller");
 
@@ -45,8 +45,8 @@ int main(int argc, char *argv[])
 		/////////////////////////////////////////////////////////////////////////////
 		if (myChip8.loadROM(argv[1]))  // [1]
 		{
-			glutMainLoop();
 			parseROM.dissassemble(myChip8.chip8ram, myChip8.lengthROM16);
+			glutMainLoop();
 			myChip8.emulator();
 		}
 	}
