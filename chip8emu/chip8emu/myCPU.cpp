@@ -28,7 +28,11 @@ myCPU::myCPU()
 	lengthROM16 = 0;
 	lengthROM8 = 0;
 
-	drawFlag = true;
+	// Window size
+	display_width = 64 * 10;
+	display_height = 32 * 10;
+
+	drawFlag = true; // See header refs.
 	memset(gfx, 0, 2048);
 
 	for (unsigned int i = 0; i < 16; i++)
@@ -69,7 +73,6 @@ bool myCPU::loadROM(string filename)
 	short j = 0x0200; // Start at offset 0x0200, byte offset
 
 	// Open binary file [1]
-//	myROM.open(("..\\Debug\\INVADERS"), ios::binary);
 	myROM.open("..\\Debug\\"+filename, ios::binary);
 
 	// File is valid, verify it has been successfully opened...
@@ -122,21 +125,23 @@ void myCPU::emulator()
 	short msb = 0;
 	short lsb = 0;
 	short inst = 0;
-	
-	cout << "Press CTRL+c to exit...\n";
 
-	mytimer.initTime(); // Initialize my timer for Timer Registers...
+	static bool firstentry = false;
+	static unsigned int i = 0;
+
+	if (firstentry == false)
+		mytimer.initTime(); // Initialize my timer for Timer Registers...
 	
 	// Process ROM OpCodes...
 	// starting at address 0x0100 (or 0x0200 byte offset) for Program Memory
-	for (short i = 0x0200; i < lengthROM8;)
-	{
+//	for (short i = 0x0200; i < lengthROM8;)
+//	{
 		// Reconstitute instruction, 2 bytes [2]
 		msb = 0;
 		lsb = 0;
 		inst = 0;
-		msb = (short)chip8ram8[i];
-		lsb = (short)chip8ram8[i + 1];
+		msb = (short)chip8ram8[(i + 0x0200)];
+		lsb = (short)chip8ram8[(i + 0x0201)];
 		inst = (((msb&0xFF) << 0x8) | (lsb&0xFF));
 
 		//*****************************************************************
@@ -180,7 +185,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0x1000)
 		{
-			regPC = (0x0FFF & inst);
+			regPC = (0x0FFF & inst) - 0x0200;
 			i = regPC;
 		}
 
@@ -195,7 +200,7 @@ void myCPU::emulator()
 		{
 			regSP++;
 			regStack->push(regPC);
-			regPC = (0x0FFF & inst);
+			regPC = (0x0FFF & inst) - 0x0200;
 			i = regPC;
 		}
 
@@ -491,8 +496,33 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0xD000)
 		{
-			// TBD
+			///////////////////////////////////////////////////////////////////
+			// The following code belongs to Laurence Muller
+			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
+			///////////////////////////////////////////////////////////////////  
+			unsigned short x = regVx[(inst & 0x0F00) >> 8];
+			unsigned short y = regVx[(inst & 0x00F0) >> 4];
+			unsigned short height = inst & 0x000F;
+			unsigned short pixel;
+
+			regVx[0xF] = 0;
+			for (int yline = 0; yline < height; yline++)
+			{
+				pixel = chip8ram8[regI + yline];
+				for (int xline = 0; xline < 8; xline++)
+				{
+					if ((pixel & (0x80 >> xline)) != 0)
+					{
+						if (gfx[(x + xline + ((y + yline) * 64))] == 1)
+							regVx[0xF] = 1;
+						gfx[x + xline + ((y + yline) * 64)] ^= 1;
+					}
+				}
+			}
+
+			drawFlag = true;
 			regPC += 2;
+			///////////////////////////////////////////////////////////////////
 			i = regPC;
 		}
 		
@@ -554,7 +584,10 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF00A)
 		{
-			// TBD
+			char k;
+			cout << "Press a key 0-9, A-F...\n";
+			k = getchar();
+			regVx[((0x0F00 & inst) >> 8)] = k;
 			regPC += 2;
 			i = regPC;
 		}
@@ -611,7 +644,11 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF029)
 		{
-			// TBD
+			///////////////////////////////////////////////////////////////////
+			// The following instruction belongs to Laurence Muller
+			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
+			///////////////////////////////////////////////////////////////////  
+			regI = regVx[((inst & 0x0F00) >> 8)] * 0x5;
 			regPC += 2;
 			i = regPC;
 		}
@@ -668,5 +705,5 @@ void myCPU::emulator()
 
 		// Check on the timer registers ....
 		mytimer.handleTimers(regST, regDT);
-	}
+//	}
 }

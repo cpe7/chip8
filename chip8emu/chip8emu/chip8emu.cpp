@@ -2,23 +2,26 @@
 // Author        : Lauren Rush
 // References    : See file headers.
 //                [1] command line params: http://www.cplusplus.com/articles/DEN36Up4/
+//                [2] Laurence Muller http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
+
 #include "stdafx.h"
 #include <GL/glut.h> // GLUT binaries: http://user.xmission.com/~nate/glut.html
                      // GLUT How To: http://visualambition.wordpress.com/2010/08/12/glut-and-visual-studio-2010/
 
-
+// Global Instance (for main)
 myCPU myChip8;
-// Window size
-int display_width = 64*10;
-int display_height = 32*10;
 
+// Function prototypes
 void drawPixel(unsigned int x, unsigned int y);
-void updateQuads(myCPU& c8);
+void updateQuads();
 void display();
 void reshape_window(GLsizei w, GLsizei h);
 void keyboardUp(unsigned char key, int x, int y);
 void keyboardDown(unsigned char key, int x, int y);
 
+///////////////////////////////////////////////////////////////////////////////
+// MAIN
+///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[])
 {
 	CUtility parseROM;
@@ -33,9 +36,9 @@ int main(int argc, char *argv[])
 		glutInit(&argc, argv);
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
-		glutInitWindowSize(display_width, display_height);
+		glutInitWindowSize(myChip8.display_width, myChip8.display_height);
 		glutInitWindowPosition(320, 320);
-		glutCreateWindow("myChip8 by Laurence Muller");
+		glutCreateWindow("myChip8 by Laurence Muller (& Lauren Rush)");
 
 		glutDisplayFunc(display);
 		glutIdleFunc(display);
@@ -46,8 +49,7 @@ int main(int argc, char *argv[])
 		if (myChip8.loadROM(argv[1]))  // [1]
 		{
 			parseROM.dissassemble(myChip8.chip8ram, myChip8.lengthROM16);
-			glutMainLoop();
-			myChip8.emulator();
+			glutMainLoop(); // forever loop, until esc key pressed [2]
 		}
 	}
 	else
@@ -79,18 +81,20 @@ void drawPixel(unsigned int x, unsigned int y)
 // The following code belongs to Laurence Muller
 // http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 /////////////////////////////////////////////////////////////////////////////
-void updateQuads(myCPU& c8)
+void updateQuads()
 {
 	// Draw
 	for (int y = 0; y < 32; ++y)
-	for (int x = 0; x < 64; ++x)
 	{
-		if (c8.gfx[(y * 64) + x] == 0)
-			glColor3f(0.0f, 0.0f, 0.0f);
-		else
-			glColor3f(1.0f, 1.0f, 1.0f);
+		for (int x = 0; x < 64; ++x)
+		{
+			if (myChip8.gfx[(y * 64) + x] == 0)
+				glColor3f(0.0f, 0.0f, 0.0f);
+			else
+				glColor3f(1.0f, 1.0f, 1.0f);
 
-		drawPixel(x, y);
+			drawPixel(x, y);
+		}
 	}
 }
 
@@ -100,12 +104,16 @@ void updateQuads(myCPU& c8)
 /////////////////////////////////////////////////////////////////////////////
 void display()
 {
+	// Get Instruction
+	myChip8.emulator();
+
+	// Check if instruction modified display, and update
 	if (myChip8.drawFlag)
 	{
 		// Clear framebuffer
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		updateQuads(myChip8);
+		updateQuads();
 
 		// Swap buffers!
 		glutSwapBuffers();
@@ -129,8 +137,8 @@ void reshape_window(GLsizei w, GLsizei h)
 	glViewport(0, 0, w, h);
 
 	// Resize quad
-	display_width = w;
-	display_height = h;
+	myChip8.display_width = w;
+	myChip8.display_height = h;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -140,7 +148,7 @@ void reshape_window(GLsizei w, GLsizei h)
 void keyboardDown(unsigned char key, int x, int y)
 {
 	if (key == 27)    // esc
-		return;
+		exit(0);
 
 	if (key == '1')		myChip8.key[0x1] = 1;
 	else if (key == '2')	myChip8.key[0x2] = 1;
@@ -161,8 +169,6 @@ void keyboardDown(unsigned char key, int x, int y)
 	else if (key == 'x')	myChip8.key[0x0] = 1;
 	else if (key == 'c')	myChip8.key[0xB] = 1;
 	else if (key == 'v')	myChip8.key[0xF] = 1;
-
-	//printf("Press key %c\n", key);
 }
 
 /////////////////////////////////////////////////////////////////////////////
