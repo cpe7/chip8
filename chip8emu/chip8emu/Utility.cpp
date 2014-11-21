@@ -44,34 +44,36 @@ void CUtility::handleTimers(char &rST, char &rDT)
 
 	// SYSTEMTIME
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/ms724950(v=vs.85).aspx
-	SYSTEMTIME systime;
-	GetSystemTime(&systime);
+//	SYSTEMTIME systime;
+//	GetSystemTime(&systime);
 
 	// Convert current System Time to msec
-	now = ((((systime.wHour * 3600) + (systime.wMinute * 60) + systime.wSecond) * 1000) + systime.wMilliseconds);
+//	now = ((((systime.wHour * 3600) + (systime.wMinute * 60) + systime.wSecond) * 1000) + systime.wMilliseconds);
 
 	//Decrement the timers if 16 msec or more has gone by...
-	if (now - lastTick > 16) //1/60Hz, or 16.667ms
-	{
+//	if (now - lastTick > 16) //1/60Hz, or 16.667ms
+//	{
 		//Determine how many ticks have passed
-		unsigned int tickspast = now - lastTick;
-		tickspast /= 16;
+//		unsigned int tickspast = now - lastTick;
+//		tickspast /= 16;
 
 		if (rST > 0)
 		{
 			// if ST register is greater than tickspast, subtract tickspast, else subtract rST
 			// http://www.cplusplus.com/articles/1AUq5Di1/
-			rST = rST - (((unsigned int)rST > tickspast) ? tickspast : rST);
+//			rST = rST - (((unsigned int)rST > tickspast) ? tickspast : rST);
+			rST--;
 			// Beep()
 		}
 		if (rDT > 0)
 		{
 			// if DT register is greater than tickspast, subtract tickspast, else subtract rDT
 			// http://www.cplusplus.com/articles/1AUq5Di1/
-			rDT = rDT - (((unsigned int)rDT > tickspast) ? tickspast : rDT);
+//			rDT = rDT - (((unsigned int)rDT > tickspast) ? tickspast : rDT);
+			rDT--;
 		}
-		lastTick = now;
-	}
+//		lastTick = now;
+//	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////
