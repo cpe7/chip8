@@ -10,6 +10,14 @@ Stack::~Stack()
 {
 }
 
+Stack::Stack(int size)
+{
+	this->size = size;
+	values = new int[size];
+	memset(values, 0, size);
+	top = -1;
+}
+
 bool Stack::isFull()
 {
 	if (top < (size - 1))

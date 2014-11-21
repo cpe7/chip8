@@ -5,6 +5,7 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #pragma once
+#include "Utility.h"
 
 class Stack
 {
@@ -19,13 +20,7 @@ public:
 	void push(int x);
 	int  pop();
 
-	Stack(int size)
-	{
-		this->size = size;
-		values = new int[size];
-		top = -1;
-	}
-
+	Stack(int size);
 	~Stack();
 };
 ///////////////////////////////////////////////////////////////////////////

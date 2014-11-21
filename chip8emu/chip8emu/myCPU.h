@@ -57,7 +57,7 @@ public:
 	// - SP (stack pointer)
 	char regSP;
 	// - Stack: array of 16, 16-bit values
-	Stack* regStack;
+	Stack regStack = Stack(0x10);
 
 	///////////////////////////////////////////////////////////////////////////
 	// KEYBOARD, per [1]
