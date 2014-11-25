@@ -30,11 +30,13 @@ public:
 	bool drawFlag; // From Laurence Muller example Chip-8 Emulator, [2]
 
 	CUtility mytimer;
-	
+
+	ofstream debugger;
+
 	///////////////////////////////////////////////////////////////////////////
 	// MEMORY MAP, per [1]
 	///////////////////////////////////////////////////////////////////////////
-	char chip8ram8[0x0FFF];
+	char chip8ram8[0x1000];
 	short chip8ram[0x0800]; // 4096 bytes [1]
 	                        // 0x0000 - 0x01FF: Reserved for interpretter
 	                        // 0x0200 - 0x0FFF: Program/Data RAM
@@ -46,8 +48,6 @@ public:
 	short regVx[0x10];
 	// - I, 16-bit register stores memory addresses
 	short regI;
-	// - VF register used by instructions
-	char regVF;
 	// - DT (delay timer)
 	char regDT;
 	// - ST (sound timer)
@@ -63,7 +63,7 @@ public:
 	// KEYBOARD, per [1]
 	// From Laurence Muller example Chip-8 Emulator, [2]
 	///////////////////////////////////////////////////////////////////////////
-	unsigned char key[16]; // 0-9,A-F keys
+	unsigned char key[0x10]; // 0-9,A-F keys
 
 	///////////////////////////////////////////////////////////////////////////
 	// DISPLAY, per [1]

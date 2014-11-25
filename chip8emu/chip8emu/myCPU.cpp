@@ -5,7 +5,11 @@
 //            [3] Chip-8 Instruction set: http://devernay.free.fr/hacks/chip8/C8TECH10.HTM#3.0
 //            [4] iomanip: http://en.cppreference.com/w/cpp/io/manip/
 //			  [5] rand: http://www.cplusplus.com/reference/cstdlib/rand/?kw=rand
-
+//			  [6] Laurence Muller, Chip-8 Emulator: 
+//            http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
+//            [7] Lyndon Armitage, Chip-8 Emulator:
+//            http://lyndonarmitage.com/chip-8-emulator/
+//            https://github.com/LyndonArmitage/Chip8/blob/master/Chip8/Chip8.cpp
 #include "myCPU.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,20 +37,18 @@ myCPU::myCPU()
 	display_height = 32 * 10;
 
 	drawFlag = true; // See header refs.
-	memset(gfx, 0, 2048);
+	memset(gfx, 0, ((64 * 32)));
 
-	for (unsigned int i = 0; i < 16; i++)
+	for (unsigned int i = 0; i < 0x10; i++)
 		key[i] = 0; // not pressed
 
 	///////////////////////////////////////////////////////////////////////////
 	// REGISTERS, per [3]
 	///////////////////////////////////////////////////////////////////////////
 	// - 16 general purpose 8-bit registers, Vx where x = 0 to F
-	memset(regVx, 0, 0xF);
+	memset(regVx, 0, 0x10);
 	// - I, 16-bit register stores memory addresses
 	regI = 0x00;
-	// - VF register used by instructions
-	regVF = 0x0;
 	// - DT (delay timer)
 	regDT = 0x0;
 	// - ST (sound timer)
@@ -57,6 +59,9 @@ myCPU::myCPU()
 	regSP = 0x0;
 	// - Stack: array of 16, 16-bit values
 	regStack = Stack(0x10);
+
+	debugger.open("debug.out");
+	debugger << "PC    INSTRUCTION" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,6 +134,8 @@ void myCPU::emulator()
 	static bool firstentry = false;
 	static unsigned int i = 0;
 
+	static short inst_prev = 0;
+
 	if (firstentry == false)
 		mytimer.initTime(); // Initialize my timer for Timer Registers...
 	
@@ -157,7 +164,7 @@ void myCPU::emulator()
 		if (inst == 0x00E0)
 		{
 			drawFlag = true;
-			memset(gfx, 0, 2048);
+			memset(gfx, 0, (64 * 32));
 			regPC += 2;
 			i = regPC;
 		}
@@ -172,7 +179,7 @@ void myCPU::emulator()
 		{
 			regPC = regStack.pop();
 			regSP--;
-			regPC += 2; // Laurence Muller
+			regPC += 2; // correction from Laurence Muller [6]
 			i = regPC;
 		}
 
@@ -183,7 +190,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0x1000)
 		{
-			regPC = (0x0FFF & inst) - 0x0200;
+			regPC = ((0x0FFF & inst) - 0x0200);
 			i = regPC;
 		}
 
@@ -198,7 +205,7 @@ void myCPU::emulator()
 		{
 			regSP++;
 			regStack.push(regPC);
-			regPC = (0x0FFF & inst) - 0x0200;
+			regPC = ((0x0FFF & inst) - 0x0200);
 			i = regPC;
 		}
 
@@ -353,15 +360,21 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF00F) == 0x8004)
 		{
+			// Vx = Vx + Vy
 			regVx[((0x0F00 & inst) >> 8)] += regVx[((0x00F0 & inst) >> 4)];
-			if (regVx[((0x0F00 & inst) >> 8)] > 255)
+
+			//   If the result is greater than 8 bits(i.e., > 255, ) 
+			//   VF is set to 1, otherwise 0. 
+			if (regVx[((0x0F00 & inst) >> 8)] > 0xFF)
 			{
-				regVF = 1;
+				regVx[0xF] = 1;
 			}
 			else
-				regVF = 0;
+				regVx[0xF] = 0;
 
-			regVx[((0x0F00 & inst) >> 8)] &= 0x000F;
+			//  Only the lowest 8 bits of the result are kept, and stored in Vx.
+			// TBD - neither Laurence or Lyndon do this step
+			// regVx[((0x0F00 & inst) >> 8)] &= 0xF;
 
 			regPC+=2;
 			i = regPC;
@@ -375,8 +388,11 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF00F) == 0x8005)
 		{
+			// if Vx > Vy, set to 1, otherwise 0
 			if (regVx[((0x0F00 & inst) >> 8)] > regVx[((0x00F0 & inst) >> 4)])
-				regVF = 1;
+				regVx[0xF] = 1;
+			else
+				regVx[0xF] = 0; // corrected from Laurence Muller's solution [6]
 
 			regVx[((0x0F00 & inst) >> 8)] -= regVx[((0x00F0 & inst) >> 4)];
 
@@ -392,8 +408,8 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF00F) == 0x8006)
 		{
-			regVF = regVx[((0x0F00 & inst) >> 8)] & 0x1;
-			regVx[((0x0F00 & inst) >> 8)] = regVx[((0x0F00 & inst) >> 8)] >> 1;
+			regVx[0xF] = regVx[((0x0F00 & inst) >> 8)] & 0x1;
+			regVx[((0x0F00 & inst) >> 8)] >>= 1; // corrected from Laurence Muller's solution [6]
 
 			regPC += 2;
 			i = regPC;
@@ -407,10 +423,11 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF00F) == 0x8007)
 		{
+			// If Vy > Vx, set VF to 1, otherwise 0
 			if (regVx[((0x00F0 & inst) >> 4)] > regVx[((0x0F00 & inst) >> 8)])
-				regVF = 1;
+				regVx[0xF] = 1;
 			else
-				regVF = 0;
+				regVx[0xF] = 0;
 
 			regVx[((0x0F00 & inst) >> 8)] = regVx[((0x00F0 & inst) >> 4)] - regVx[((0x0F00 & inst) >> 8)];
 
@@ -426,8 +443,8 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF00F) == 0x800E)
 		{
-			regVF = (regVx[((0x0F00 & inst) >> 8)] >> 7) & 0x1; // corrected from Laurence Muller's solution
-			regVx[((0x0F00 & inst) >> 8)] = (regVx[((0x0F00 & inst) >> 8)] << 1);
+			regVx[0xF] = (regVx[((0x0F00 & inst) >> 8)] >> 7); // corrected from Laurence Muller's solution [6]
+			regVx[((0x0F00 & inst) >> 8)] <<= 1; // corrected from Laurence Muller's solution [6]
 
 			regPC+=2;
 			i = regPC;
@@ -446,7 +463,7 @@ void myCPU::emulator()
 				regPC += 4;
 				i = regPC;
 			}
-			else // corrected from Laurence Muller's solution
+			else // corrected from Laurence Muller's solution [6]
 			{
 				regPC += 2;
 				i = regPC;
@@ -485,8 +502,8 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0xC000)
 		{
-			char temp = rand() % 255; // [5]
-			regVx[((0x0F00 & inst) >> 8)] = temp & ((0x00FF) & inst);
+			char temp = (rand() % 0xFF); // [5], [6]
+			regVx[((0x0F00 & inst) >> 8)] = (temp & ((0x00FF) & inst));
 
 			regPC += 2;
 			i = regPC;
@@ -513,23 +530,27 @@ void myCPU::emulator()
 			// The following code belongs to Laurence Muller
 			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 			///////////////////////////////////////////////////////////////////  
-			unsigned short x = regVx[(inst & 0x0F00) >> 8];
-			unsigned short y = regVx[(inst & 0x00F0) >> 4];
-			unsigned short height = inst & 0x000F;
-			unsigned short pixel;
+			unsigned short x = regVx[((inst & 0x0F00) >> 8)];
+			unsigned short y = regVx[((inst & 0x00F0) >> 4)];
+			unsigned short height = (inst & 0x000F);
+			unsigned short pixel = 0;
 
 			regVx[0xF] = 0;
 			for (int yline = 0; yline < height; yline++)
 			{
-				pixel = chip8ram8[regI + yline]; 
+				pixel = chip8ram8[(regI + yline)]; 
 				
 				for (int xline = 0; xline < 8; xline++)
 				{
 					if ((pixel & (0x80 >> xline)) != 0)
 					{
 						if (gfx[(x + xline + ((y + yline) * 64))] == 1)
+						{
 							regVx[0xF] = 1;
-						gfx[x + xline + ((y + yline) * 64)] ^= 1;
+						}
+						if ((x + xline + ((y + yline) * 64)) > (64 * 32))
+							regVx[0xF] = 0;
+						gfx[(x + xline + ((y + yline) * 64))] ^= 1;
 					}
 				}
 			}
@@ -548,7 +569,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xE09E)
 		{
-			if (key[((inst & 0x0F00) >> 8)] == 1) // Key pressed
+			if (key[regVx[((inst & 0x0F00) >> 8)]] != 0) // corrected from Laurence Muller's solution [6]
 			{
 				regPC += 4;
 			}
@@ -567,7 +588,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xE0A1)
 		{
-			if (key[((inst & 0x0F00) >> 8)] == 0) // Key NOT pressed
+			if (key[regVx[((inst & 0x0F00) >> 8)]] == 0) // corrected from Laurence Muller's solution [6]
 			{
 				regPC += 4;
 			}
@@ -605,11 +626,11 @@ void myCPU::emulator()
 			///////////////////////////////////////////////////////////////////  
 			bool keyPress = false;
 
-			for (int k = 0; k < 16; ++k)
+			for (int k = 0; k < 0x10; ++k)
 			{
 				if (key[k] != 0)
 				{
-					regVx[(inst & 0x0F00) >> 8] = k;
+					regVx[((inst & 0x0F00) >> 8)] = k;
 					keyPress = true;
 				}
 			}
@@ -666,7 +687,7 @@ void myCPU::emulator()
 			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 			///////////////////////////////////////////////////////////////////  
 			// VF is set to 1 when range overflow (I+VX>0xFFF), and 0 when there isn't.
-			if (regI + regVx[(inst & 0x0F00) >> 8] > 0xFFF)	
+			if ((regI + regVx[(inst & 0x0F00) >> 8]) > 0xFFF)	
 			{
 				regVx[0xF] = 1;
 			}
@@ -693,7 +714,7 @@ void myCPU::emulator()
 			// The following instruction belongs to Laurence Muller
 			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 			///////////////////////////////////////////////////////////////////  
-			regI = regVx[((inst & 0x0F00) >> 8)] * 0x5;
+			regI = (regVx[((inst & 0x0F00) >> 8)] * 0x5);
 			regPC += 2;
 			i = regPC;
 		}
@@ -706,14 +727,14 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF033)
 		{
-			chip8ram8[regI] = (char)(regVx[((0x0F00 & inst) >> 8)] / 100); // corrected from Laurence Muller's solution
-			chip8ram8[regI+1] = (char)(regVx[((0x0F00 & inst) >> 8)] / 10) % 10; // corrected from Laurence Muller's solution
-			chip8ram8[regI+2] = (char)(regVx[((0x0F00 & inst) >> 8)] % 100) % 10; // corrected from Laurence Muller's solution
+			chip8ram8[regI] = (char)((regVx[((0x0F00 & inst) >> 8)] / 100)); // corrected from Laurence Muller's solution [6]
+			chip8ram8[regI+1] = (char)((regVx[((0x0F00 & inst) >> 8)] / 10) % 10); // corrected from Laurence Muller's solution [6]
+			chip8ram8[regI+2] = (char)((regVx[((0x0F00 & inst) >> 8)] % 100) % 10); // corrected from Laurence Muller's solution [6]
 			regPC += 2;
 			i = regPC;
 		}
 
-		//*****************************************************************
+		//***********`******************************************************
 		// (34)	Fx55 - LD[I], Vx
 		//	Store registers V0 through Vx in memory starting at location I.
 		//	The interpreter copies the values of registers V0 through Vx 
@@ -721,14 +742,14 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF055)
 		{
-			for (short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution
+			for (short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution [6]
 			{
-				chip8ram8[regI + m] = (char)regVx[m]; // corrected from Laurence Muller's solution
+				chip8ram8[(regI + m)] = (char)regVx[m]; // corrected from Laurence Muller's solution [6]
 			}
 
 			// On the original interpreter, when the operation is done, I = I + X + 1.
-			// Laurence Muller
-			regI += ((inst & 0x0F00) >> 8) + 1;
+			// Laurence Muller [6]
+			regI += (((inst & 0x0F00) >> 8) + 1);
 
 			regPC += 2;
 			i = regPC;
@@ -742,14 +763,14 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF065)
 		{
-			for (short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution
+			for (short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution [6]
 			{
-				regVx[m] = chip8ram8[regI + m]; // corrected from Laurence Muller's solution
+				regVx[m] = chip8ram8[(regI + m)]; // corrected from Laurence Muller's solution [6]
 			}
 
 			// On the original interpreter, when the operation is done, I = I + X + 1.
-			// Laurence Muller
-			regI += ((inst & 0x0F00) >> 8) + 1;
+			// Laurence Muller [6]
+			regI += (((inst & 0x0F00) >> 8) + 1);
 
 			regPC += 2;
 			i = regPC;
@@ -762,5 +783,9 @@ void myCPU::emulator()
 
 		// Check on the timer registers ....
 		mytimer.handleTimers(regST, regDT);
-//	}
+
+		inst_prev = inst;
+		
+		//debugger << "PC    INSTRUCTION" << endl;
+		debugger << hex << regPC << ",    " << inst << endl;
 }
