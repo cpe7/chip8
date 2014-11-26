@@ -20,6 +20,6 @@ public:
 
 	void initTime();
 	void dissassemble(short const * chip8ram, short const lengthROM16);
-	void handleTimers(char &rST, char &rDT);
+	void handleTimers(unsigned char &rST, unsigned char &rDT);
 };
 

@@ -38,7 +38,7 @@ void CUtility::initTime()
 // The following method is adapted from emulator101.com handleTimers function:
 // http://www.emulator101.com.s3-website-us-east-1.amazonaws.com/chip-8-port-pt-2-machine-object/ 
 ///////////////////////////////////////////////////////////////////////////////
-void CUtility::handleTimers(char &rST, char &rDT)
+void CUtility::handleTimers(unsigned char &rST, unsigned char &rDT)
 {
 	unsigned int now = 0;
 
@@ -90,7 +90,7 @@ void CUtility::dissassemble(short const * chip8ram, short const lengthROM16)
 	myDIS << "ADDRESS (WORD)     ADDRESS (BYTE)    OPCODE     MNEMONIC\n";
 
 	// Start parsing through ROM
-	// starting at address 0x0100 (or 0x0200 byte offset) for Program Memory
+	// starting at address 0x0100 (or 0x0
 	for (short i = 0x0100; i < lengthROM16; i++)
 	{
 		// Parse address, opcode, mnemonic... [4]

@@ -17,8 +17,6 @@ public:
 
 	bool loadROM(string filename);
 	void emulator();
-	void keyboardUp(unsigned char key, int x, int y);
-	void keyboardDown(unsigned char key, int x, int y);
 
 	short lengthROM16; // 16-bit words length
 	short lengthROM8;  // byte length
@@ -30,8 +28,6 @@ public:
 	bool drawFlag; // From Laurence Muller example Chip-8 Emulator, [2]
 
 	CUtility mytimer;
-
-	ofstream debugger;
 
 	///////////////////////////////////////////////////////////////////////////
 	// MEMORY MAP, per [1]
@@ -45,17 +41,17 @@ public:
 	// REGISTERS, per [1]
 	///////////////////////////////////////////////////////////////////////////
 	// - 16 general purpose 8-bit registers, Vx where x = 0 to F
-	short regVx[0x10];
+	unsigned char regVx[0x10]; // correction [2]
 	// - I, 16-bit register stores memory addresses
-	short regI;
+	unsigned short regI; // correction - added 'unsigned' [2]
 	// - DT (delay timer)
-	char regDT;
+	unsigned char regDT; // correction - added 'unsigned' [2]
 	// - ST (sound timer)
-	char regST;
+	unsigned char regST; // correction - added 'unsigned' [2]
 	// - PC (program counter)
-	short regPC;
+	unsigned short regPC; // correction - added 'unsigned' [2]
 	// - SP (stack pointer)
-	char regSP;
+	unsigned short regSP; // correction - added 'unsigned short' [2]
 	// - Stack: array of 16, 16-bit values
 	Stack regStack = Stack(0x10);
 

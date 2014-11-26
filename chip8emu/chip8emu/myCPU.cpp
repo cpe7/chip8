@@ -28,7 +28,7 @@ myCPU::myCPU()
 {
 	// 0x0000 - 0x01FF: Reserved for interpretter
 	// 0x0200 - 0x0FFF: Program/Data RAM
-	memset(chip8ram, 0x00, 0x0FFF);
+	memset(chip8ram, 0x00, 0x1000);
 	lengthROM16 = 0;
 	lengthROM8 = 0;
 
@@ -54,14 +54,11 @@ myCPU::myCPU()
 	// - ST (sound timer)
 	regST = 0x0;
 	// - PC (program counter)
-	regPC = 0x00;
+	regPC = 0x0200; // correction [6]
 	// - SP (stack pointer)
 	regSP = 0x0;
 	// - Stack: array of 16, 16-bit values
 	regStack = Stack(0x10);
-
-	debugger.open("debug.out");
-	debugger << "PC    INSTRUCTION" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -127,14 +124,12 @@ bool myCPU::loadROM(string filename)
 ///////////////////////////////////////////////////////////////////////////////
 void myCPU::emulator()
 {
-	short msb = 0;
-	short lsb = 0;
-	short inst = 0;
+	unsigned short msb = 0;
+	unsigned short lsb = 0;
+	unsigned short inst = 0;
 
 	static bool firstentry = false;
-	static unsigned int i = 0;
-
-	static short inst_prev = 0;
+	static unsigned short i = 0;
 
 	if (firstentry == false)
 		mytimer.initTime(); // Initialize my timer for Timer Registers...
@@ -144,8 +139,8 @@ void myCPU::emulator()
 		msb = 0;
 		lsb = 0;
 		inst = 0;
-		msb = (short)chip8ram8[(i + 0x0200)];
-		lsb = (short)chip8ram8[(i + 0x0201)];
+		msb = (short)chip8ram8[i];
+		lsb = (short)chip8ram8[i+1];
 		inst = (((msb&0xFF) << 0x8) | (lsb&0xFF));
 
 		//*****************************************************************
@@ -190,7 +185,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0x1000)
 		{
-			regPC = ((0x0FFF & inst) - 0x0200);
+			regPC = (0x0FFF & inst);
 			i = regPC;
 		}
 
@@ -205,7 +200,7 @@ void myCPU::emulator()
 		{
 			regSP++;
 			regStack.push(regPC);
-			regPC = ((0x0FFF & inst) - 0x0200);
+			regPC = (0x0FFF & inst);
 			i = regPC;
 		}
 
@@ -489,7 +484,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0xB000)
 		{
-			regPC = (regVx[0] + (0x0FFF & inst)) - 0x0200;
+			regPC = regVx[0] + (0x0FFF & inst);
 			i = regPC;
 		}
 
@@ -548,8 +543,7 @@ void myCPU::emulator()
 						{
 							regVx[0xF] = 1;
 						}
-						if ((x + xline + ((y + yline) * 64)) > (64 * 32))
-							regVx[0xF] = 0;
+ 
 						gfx[(x + xline + ((y + yline) * 64))] ^= 1;
 					}
 				}
@@ -650,7 +644,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF015)
 		{
-			regDT = (char)regVx[((0x0F00 & inst) >> 8)];
+			regDT = regVx[((0x0F00 & inst) >> 8)];
 			regPC += 2;
 			i = regPC;
 		}
@@ -670,7 +664,7 @@ void myCPU::emulator()
 			// The sound produced by the Chip - 8 interpreter has only one 
 			// tone.  The frequency of this tone is decided by the author 
 			//  of the interpreter.
-			regST = (char)regVx[((0x0F00 & inst) >> 8)];
+			regST = regVx[((0x0F00 & inst) >> 8)];
 			regPC += 2;
 			i = regPC;
 		}
@@ -727,9 +721,9 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF033)
 		{
-			chip8ram8[regI] = (char)((regVx[((0x0F00 & inst) >> 8)] / 100)); // corrected from Laurence Muller's solution [6]
-			chip8ram8[regI+1] = (char)((regVx[((0x0F00 & inst) >> 8)] / 10) % 10); // corrected from Laurence Muller's solution [6]
-			chip8ram8[regI+2] = (char)((regVx[((0x0F00 & inst) >> 8)] % 100) % 10); // corrected from Laurence Muller's solution [6]
+			chip8ram8[regI] = ((regVx[((0x0F00 & inst) >> 8)] / 100)); // corrected from Laurence Muller's solution [6]
+			chip8ram8[regI+1] = ((regVx[((0x0F00 & inst) >> 8)] / 10) % 10); // corrected from Laurence Muller's solution [6]
+			chip8ram8[regI+2] = ((regVx[((0x0F00 & inst) >> 8)] % 100) % 10); // corrected from Laurence Muller's solution [6]
 			regPC += 2;
 			i = regPC;
 		}
@@ -744,7 +738,7 @@ void myCPU::emulator()
 		{
 			for (short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution [6]
 			{
-				chip8ram8[(regI + m)] = (char)regVx[m]; // corrected from Laurence Muller's solution [6]
+				chip8ram8[(regI + m)] = regVx[m]; // corrected from Laurence Muller's solution [6]
 			}
 
 			// On the original interpreter, when the operation is done, I = I + X + 1.
@@ -783,9 +777,4 @@ void myCPU::emulator()
 
 		// Check on the timer registers ....
 		mytimer.handleTimers(regST, regDT);
-
-		inst_prev = inst;
-		
-		//debugger << "PC    INSTRUCTION" << endl;
-		debugger << hex << regPC << ",    " << inst << endl;
-}
+} 

@@ -13,8 +13,9 @@
 myCPU myChip8;
 
 // Function prototypes
-void drawPixel(unsigned int x, unsigned int y);
-void updateQuads();
+//void drawPixel(unsigned int x, unsigned int y);
+//void updateQuads();
+
 void display();
 void reshape_window(GLsizei w, GLsizei h);
 void keyboardUp(unsigned char key, int x, int y);
@@ -125,7 +126,7 @@ void display()
 
 	// Slow down loop 
 	///////////////////////////////////////////////////////////////////////////
-	for (unsigned int t = 0; t < 80000; ++t);
+	for (unsigned int t = 0; t < 600000; ++t);
 	///////////////////////////////////////////////////////////////////////////
 }
 
@@ -235,3 +236,4 @@ void keyboardUp(unsigned char key, int x, int y)
 	else if (key == 'v')	
 		myChip8.key[0xF] = 0;
 }
+
