@@ -30,7 +30,6 @@ myCPU::myCPU()
 	// 0x0200 - 0x0FFF: Program/Data RAM
 	memset(chip8ram, 0x00, 0x1000);
 	lengthROM16 = 0;
-	lengthROM8 = 0;
 
 	// Window size
 	display_width = 64 * 10;
@@ -67,14 +66,15 @@ myCPU::myCPU()
 ///////////////////////////////////////////////////////////////////////////////
 bool myCPU::loadROM(string filename)
 {
-	short msb = 0;
-	short lsb = 0;
-	short inst = 0;
-	ifstream myROM;
-	short i = 0x0100; // Start at offset 0x0100, word offset
-	short j = 0x0200; // Start at offset 0x0200, byte offset
+	unsigned short msb = 0;
+	unsigned short lsb = 0;
+	unsigned short inst = 0;
+	
+	unsigned short i = 0x0100; // Start at offset 0x0100, word offset
+	unsigned short j = 0x0200; // Start at offset 0x0200, byte offset
 
 	// Open binary file [1]
+	ifstream myROM;
 	myROM.open("..\\Debug\\"+filename, ios::binary);
 
 	// File is valid, verify it has been successfully opened...
@@ -88,8 +88,8 @@ bool myCPU::loadROM(string filename)
 			lsb = myROM.get();
 
 			// Save OpCodes byte at a  time
-			chip8ram8[j++] = (char)msb;
-			chip8ram8[j++] = (char)lsb;
+			chip8ram8[j++] = (unsigned char)msb;
+			chip8ram8[j++] = (unsigned char)lsb;
 
 			// Reconstitute instruction, 2 bytes [2]
 			inst = ((msb << 0x8) | lsb); 
@@ -104,8 +104,8 @@ bool myCPU::loadROM(string filename)
 		} while (myROM.peek() != EOF); 
 
 		// Save length of ROM (number of 16-bit words)
-		lengthROM16 = i-1;
-		lengthROM8 = j;
+		lengthROM16 = i;
+
 		// Close input file...
 		myROM.close();
 		return true;
@@ -139,8 +139,8 @@ void myCPU::emulator()
 		msb = 0;
 		lsb = 0;
 		inst = 0;
-		msb = (short)chip8ram8[i];
-		lsb = (short)chip8ram8[i+1];
+		msb = (unsigned short)chip8ram8[i];
+		lsb = (unsigned short)chip8ram8[i+1];
 		inst = (((msb&0xFF) << 0x8) | (lsb&0xFF));
 
 		//*****************************************************************
@@ -173,7 +173,7 @@ void myCPU::emulator()
 		if (inst == 0x00EE)
 		{
 			regPC = regStack.pop();
-			regSP--;
+			--regSP;
 			regPC += 2; // correction from Laurence Muller [6]
 			i = regPC;
 		}
@@ -198,7 +198,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0x2000)
 		{
-			regSP++;
+			++regSP;
 			regStack.push(regPC);
 			regPC = (0x0FFF & inst);
 			i = regPC;
@@ -271,8 +271,8 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0x6000)
 		{
-			regVx[((0x0F00 & inst) >> 8)] = (0x00FF & inst);
-			regPC+=2;
+			regVx[((0x0F00 & inst) >> 8)] = (unsigned char)(0x00FF & inst);
+			regPC += 2;
 			i = regPC;
 		}
 
@@ -284,9 +284,9 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0x7000)
 		{
-			regVx[((0x0F00 & inst) >> 8)] += (0x00FF & inst);
+			regVx[((0x0F00 & inst) >> 8)] += (unsigned char)(0x00FF & inst);
 
-			regPC+=2;
+			regPC += 2;
 			i = regPC;
 		}
 
@@ -299,7 +299,7 @@ void myCPU::emulator()
 		{
 			regVx[((0x0F00 & inst) >> 8)] = regVx[((0x00F0 & inst) >> 4)];
 
-			regPC+=2;
+			regPC += 2;
 			i = regPC;
 		}
 
@@ -403,7 +403,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF00F) == 0x8006)
 		{
-			regVx[0xF] = regVx[((0x0F00 & inst) >> 8)] & 0x1;
+			regVx[0xF] = (regVx[((0x0F00 & inst) >> 8)] & 0x1);
 			regVx[((0x0F00 & inst) >> 8)] >>= 1; // corrected from Laurence Muller's solution [6]
 
 			regPC += 2;
@@ -484,7 +484,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0xB000)
 		{
-			regPC = regVx[0] + (0x0FFF & inst);
+			regPC = (unsigned short)regVx[0] + (0x0FFF & inst);
 			i = regPC;
 		}
 
@@ -497,8 +497,8 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF000) == 0xC000)
 		{
-			char temp = (rand() % 0xFF); // [5], [6]
-			regVx[((0x0F00 & inst) >> 8)] = (temp & ((0x00FF) & inst));
+			unsigned char temp = (rand() % 0xFF); // [5], [6]
+			regVx[((0x0F00 & inst) >> 8)] = (unsigned char)(temp & ((0x00FF) & inst));
 
 			regPC += 2;
 			i = regPC;
@@ -525,8 +525,8 @@ void myCPU::emulator()
 			// The following code belongs to Laurence Muller
 			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 			///////////////////////////////////////////////////////////////////  
-			unsigned short x = regVx[((inst & 0x0F00) >> 8)];
-			unsigned short y = regVx[((inst & 0x00F0) >> 4)];
+			unsigned char x = regVx[((inst & 0x0F00) >> 8)];
+			unsigned char y = regVx[((inst & 0x00F0) >> 4)];
 			unsigned short height = (inst & 0x000F);
 			unsigned short pixel = 0;
 
@@ -620,7 +620,7 @@ void myCPU::emulator()
 			///////////////////////////////////////////////////////////////////  
 			bool keyPress = false;
 
-			for (int k = 0; k < 0x10; ++k)
+			for (unsigned char k = 0; k < 0x10; ++k)
 			{
 				if (key[k] != 0)
 				{
@@ -708,7 +708,7 @@ void myCPU::emulator()
 			// The following instruction belongs to Laurence Muller
 			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 			///////////////////////////////////////////////////////////////////  
-			regI = (regVx[((inst & 0x0F00) >> 8)] * 0x5);
+			regI = (unsigned short)(regVx[((inst & 0x0F00) >> 8)] * 0x5);
 			regPC += 2;
 			i = regPC;
 		}
@@ -736,7 +736,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF055)
 		{
-			for (short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution [6]
+			for (unsigned short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution [6]
 			{
 				chip8ram8[(regI + m)] = regVx[m]; // corrected from Laurence Muller's solution [6]
 			}
@@ -757,7 +757,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		else if ((inst & 0xF0FF) == 0xF065)
 		{
-			for (short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution [6]
+			for (unsigned short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution [6]
 			{
 				regVx[m] = chip8ram8[(regI + m)]; // corrected from Laurence Muller's solution [6]
 			}

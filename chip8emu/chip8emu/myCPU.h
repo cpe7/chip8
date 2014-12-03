@@ -18,8 +18,7 @@ public:
 	bool loadROM(string filename);
 	void emulator();
 
-	short lengthROM16; // 16-bit words length
-	short lengthROM8;  // byte length
+	unsigned short lengthROM16; // 16-bit words length
 
 	// Window size
 	int display_width;
@@ -32,8 +31,8 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	// MEMORY MAP, per [1]
 	///////////////////////////////////////////////////////////////////////////
-	char chip8ram8[0x1000];
-	short chip8ram[0x0800]; // 4096 bytes [1]
+	unsigned char chip8ram8[0x1000];
+	unsigned short chip8ram[0x0800]; // 4096 bytes [1]
 	                        // 0x0000 - 0x01FF: Reserved for interpretter
 	                        // 0x0200 - 0x0FFF: Program/Data RAM
 

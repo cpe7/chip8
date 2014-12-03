@@ -81,7 +81,7 @@ void CUtility::handleTimers(unsigned char &rST, unsigned char &rDT)
 // Purpose: Parse ROM and create source assembly listing to save to file
 //          output.s
 ///////////////////////////////////////////////////////////////////////////////
-void CUtility::dissassemble(short const * chip8ram, short const lengthROM16)
+void CUtility::dissassemble(unsigned short const * chip8ram, unsigned short const lengthROM16)
 {
 	ofstream myDIS;
 

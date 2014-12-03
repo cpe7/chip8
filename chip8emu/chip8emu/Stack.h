@@ -12,13 +12,13 @@ class Stack
 private:
 	int size;
 	int top;
-	int* values;
+	unsigned short* values;
 
 public:
 	bool isFull();
 	bool isEmpty();
-	void push(int x);
-	int  pop();
+	void push(unsigned short x);
+	unsigned short  pop();
 
 	Stack(int size);
 	~Stack();

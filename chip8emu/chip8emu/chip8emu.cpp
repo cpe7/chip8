@@ -126,7 +126,7 @@ void display()
 
 	// Slow down loop 
 	///////////////////////////////////////////////////////////////////////////
-	for (unsigned int t = 0; t < 600000; ++t);
+	for (unsigned int t = 0; t < 400000; ++t);
 	///////////////////////////////////////////////////////////////////////////
 }
 
@@ -155,7 +155,9 @@ void reshape_window(GLsizei w, GLsizei h)
 void keyboardDown(unsigned char key, int x, int y)
 {
 	if (key == 27)    // esc
+	{
 		exit(0);
+	}
 
 	if (key == '1')		
 		myChip8.key[0x1] = 1;

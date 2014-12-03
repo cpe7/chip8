@@ -641,3 +641,4 @@ ADDRESS (WORD)     ADDRESS (BYTE)    OPCODE     MNEMONIC
 037e               6fc               0000       
 037f               6fe               0000       
 0380               700               0000       
+0381               702               ffff       

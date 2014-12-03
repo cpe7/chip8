@@ -19,7 +19,7 @@ public:
 	~CUtility();
 
 	void initTime();
-	void dissassemble(short const * chip8ram, short const lengthROM16);
+	void dissassemble(unsigned short const * chip8ram, unsigned short const lengthROM16);
 	void handleTimers(unsigned char &rST, unsigned char &rDT);
 };
 
