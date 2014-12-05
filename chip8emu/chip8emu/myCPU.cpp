@@ -28,7 +28,7 @@ myCPU::myCPU()
 {
 	// 0x0000 - 0x01FF: Reserved for interpretter
 	// 0x0200 - 0x0FFF: Program/Data RAM
-	memset(chip8ram, 0x00, 0x1000);
+	memset(chip8ram, 0x0000, LENGTH_WORDS);
 	lengthROM16 = 0;
 
 	// Window size
@@ -36,16 +36,16 @@ myCPU::myCPU()
 	display_height = 32 * 10;
 
 	drawFlag = true; // See header refs.
-	memset(gfx, 0, ((64 * 32)));
+	memset(gfx, 0x00, LENGTH_WORDS);
 
-	for (unsigned int i = 0; i < 0x10; i++)
+	for (unsigned int i = 0; i < NUM_REGS; i++)
 		key[i] = 0; // not pressed
 
 	///////////////////////////////////////////////////////////////////////////
 	// REGISTERS, per [3]
 	///////////////////////////////////////////////////////////////////////////
 	// - 16 general purpose 8-bit registers, Vx where x = 0 to F
-	memset(regVx, 0, 0x10);
+	memset(regVx, 0x00, NUM_REGS);
 	// - I, 16-bit register stores memory addresses
 	regI = 0x00;
 	// - DT (delay timer)
@@ -57,7 +57,7 @@ myCPU::myCPU()
 	// - SP (stack pointer)
 	regSP = 0x0;
 	// - Stack: array of 16, 16-bit values
-	regStack = Stack(0x10);
+	regStack = Stack(NUM_REGS);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -159,7 +159,7 @@ void myCPU::emulator()
 		if (inst == 0x00E0)
 		{
 			drawFlag = true;
-			memset(gfx, 0, (64 * 32));
+			memset(gfx, 0x00, LENGTH_WORDS);
 			regPC += 2;
 			i = regPC;
 		}
@@ -620,7 +620,7 @@ void myCPU::emulator()
 			///////////////////////////////////////////////////////////////////  
 			bool keyPress = false;
 
-			for (unsigned char k = 0; k < 0x10; ++k)
+			for (unsigned char k = 0; k < NUM_REGS; ++k)
 			{
 				if (key[k] != 0)
 				{

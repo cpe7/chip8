@@ -8,14 +8,20 @@
 #include "stdafx.h"
 #include <GL/glut.h> // GLUT binaries: http://user.xmission.com/~nate/glut.html
                      // GLUT How To: http://visualambition.wordpress.com/2010/08/12/glut-and-visual-studio-2010/
+                     //      (1) Download the GLUT binaries (.lib, .dll, .h) here http://user.xmission.com/~nate/glut/glut-3.7.6-bin.zip
+                     //      (2) Make sure to copy the files to the following locations (these are the folders I had):
+                     //           glut.h:     ‘C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\GL\’
+                     //           glut32.lib: ‘C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\lib\’
+                     //           glut32.dll: ‘C:\Windows\System32\’
+                     //      (3) If necessary, add reference to library in:
+                     //          PROJECT --> Properties --> Linker --> Input --> Additional Dependencies
 
 // Global Instance (for main)
 myCPU myChip8;
 
 // Function prototypes
-//void drawPixel(unsigned int x, unsigned int y);
-//void updateQuads();
-
+void drawPixel(unsigned int x, unsigned int y);
+void updateQuads();
 void display();
 void reshape_window(GLsizei w, GLsizei h);
 void keyboardUp(unsigned char key, int x, int y);
@@ -126,7 +132,7 @@ void display()
 
 	// Slow down loop 
 	///////////////////////////////////////////////////////////////////////////
-	for (unsigned int t = 0; t < 400000; ++t);
+	for (unsigned int t = 0; t < 300000; ++t);
 	///////////////////////////////////////////////////////////////////////////
 }
 

@@ -31,8 +31,13 @@ public:
 	///////////////////////////////////////////////////////////////////////////
 	// MEMORY MAP, per [1]
 	///////////////////////////////////////////////////////////////////////////
-	unsigned char chip8ram8[0x1000];
-	unsigned short chip8ram[0x0800]; // 4096 bytes [1]
+	enum {
+		LENGTH_BYTES = 0x1000,
+		LENGTH_WORDS = 0x0800,
+		NUM_REGS = 0x10
+	};
+	unsigned char chip8ram8[LENGTH_BYTES];
+	unsigned short chip8ram[LENGTH_WORDS]; // 4096 bytes [1]
 	                        // 0x0000 - 0x01FF: Reserved for interpretter
 	                        // 0x0200 - 0x0FFF: Program/Data RAM
 
@@ -40,7 +45,7 @@ public:
 	// REGISTERS, per [1]
 	///////////////////////////////////////////////////////////////////////////
 	// - 16 general purpose 8-bit registers, Vx where x = 0 to F
-	unsigned char regVx[0x10]; // correction [2]
+	unsigned char regVx[NUM_REGS]; // correction [2]
 	// - I, 16-bit register stores memory addresses
 	unsigned short regI; // correction - added 'unsigned' [2]
 	// - DT (delay timer)
@@ -52,13 +57,13 @@ public:
 	// - SP (stack pointer)
 	unsigned short regSP; // correction - added 'unsigned short' [2]
 	// - Stack: array of 16, 16-bit values
-	Stack regStack = Stack(0x10);
+	Stack regStack = Stack(NUM_REGS);
 
 	///////////////////////////////////////////////////////////////////////////
 	// KEYBOARD, per [1]
 	// From Laurence Muller example Chip-8 Emulator, [2]
 	///////////////////////////////////////////////////////////////////////////
-	unsigned char key[0x10]; // 0-9,A-F keys
+	unsigned char key[NUM_REGS]; // 0-9,A-F keys
 
 	///////////////////////////////////////////////////////////////////////////
 	// DISPLAY, per [1]
