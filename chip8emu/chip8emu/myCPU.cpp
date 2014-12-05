@@ -75,40 +75,57 @@ bool myCPU::loadROM(string filename)
 
 	// Open binary file [1]
 	ifstream myROM;
-	myROM.open("..\\Debug\\"+filename, ios::binary);
+	streampos begin, end;
+	myROM.open(filename, ios::binary); // open binary file
 
 	// File is valid, verify it has been successfully opened...
 	if (myROM.is_open())
 	{
-		cout << "Loading ROM....\n";
-		// Until the end of the file, grab bytes...
-		do {
-			// Read two bytes at a time to [2]
-			msb = myROM.get();
-			lsb = myROM.get();
+		// Issue #4 - Check File size to ensure no memory overflow, using ref. [1]
+		begin = myROM.tellg();
+		myROM.seekg(ios::end); // set position to end to determine number of bytes
+		end = myROM.tellg();
+		myROM.seekg(ios::beg); // set position back to beginning
 
-			// Save OpCodes byte at a  time
-			chip8ram8[j++] = (unsigned char)msb;
-			chip8ram8[j++] = (unsigned char)lsb;
+		// If ROM is an acceptable length, proceed ...
+		if ((end - begin) <= LENGTH_BYTES)
+		{			
+			cout << "Loading ROM....\n";
+			// Until the end of the file, grab bytes...
+			do {
+				// Read two bytes at a time to [2]
+				msb = myROM.get();
+				lsb = myROM.get();
 
-			// Reconstitute instruction, 2 bytes [2]
-			inst = ((msb << 0x8) | lsb); 
+				// Save OpCodes byte at a  time
+				chip8ram8[j++] = (unsigned char)msb;
+				chip8ram8[j++] = (unsigned char)lsb;
 
-			// Save OpCodes
-			chip8ram[i++] = inst;
+				// Reconstitute instruction, 2 bytes [2]
+				inst = ((msb << 0x8) | lsb);
 
-			// Reset work variables ...
-			msb = 0;
-			lsb = 0;
-			inst = 0;
-		} while (myROM.peek() != EOF); 
+				// Save OpCodes
+				chip8ram[i++] = inst;
 
-		// Save length of ROM (number of 16-bit words)
-		lengthROM16 = i;
+				// Reset work variables ...
+				msb = 0;
+				lsb = 0;
+				inst = 0;
+			} while (myROM.peek() != EOF);
 
-		// Close input file...
-		myROM.close();
-		return true;
+			// Save length of ROM (number of 16-bit words)
+			lengthROM16 = i;
+
+			// Close input file...
+			myROM.close();
+			return true;
+		}
+		else
+		{
+			myROM.close();
+			cout << "File length too large - " << (end - begin) << endl;
+			return false;
+		}
 	}
 	else // Invalid file or filename...
 	{
