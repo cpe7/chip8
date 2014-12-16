@@ -70,5 +70,14 @@ public:
 	// From Laurence Muller example Chip-8 Emulator, [2]
 	///////////////////////////////////////////////////////////////////////////
 	unsigned char gfx[64 * 32]; // 2048 pixels, 64 x 32 pixels
+
+	/////////////////////
+	// parsing variables
+	/////////////////////
+	unsigned short msb;
+	unsigned short lsb;
+	unsigned short inst;
+	bool firstentry;
+	unsigned short index;
 };
 

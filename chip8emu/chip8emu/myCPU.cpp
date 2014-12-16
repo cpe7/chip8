@@ -58,6 +58,15 @@ myCPU::myCPU()
 	regSP = 0x0;
 	// - Stack: array of 16, 16-bit values
 	regStack = Stack(NUM_REGS);
+
+	/////////////////////
+	// parsing variables
+	/////////////////////
+	msb = 0;
+	lsb = 0;
+	inst = 0;
+	firstentry = false;
+	index = 0; // index
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -141,13 +150,6 @@ bool myCPU::loadROM(string filename)
 ///////////////////////////////////////////////////////////////////////////////
 void myCPU::emulator()
 {
-	unsigned short msb = 0;
-	unsigned short lsb = 0;
-	unsigned short inst = 0;
-
-	static bool firstentry = false;
-	static unsigned short i = 0x200;
-
 	if (firstentry == false)
 		mytimer.initTime(); // Initialize my timer for Timer Registers...
 
@@ -156,8 +158,8 @@ void myCPU::emulator()
 	msb = 0;
 	lsb = 0;
 	inst = 0;
-	msb = (unsigned short)chip8ram8[i];
-	lsb = (unsigned short)chip8ram8[i + 1];
+	msb = (unsigned short)chip8ram8[index];
+	lsb = (unsigned short)chip8ram8[index + 1];
 	inst = (((msb & 0xFF) << 0x8) | (lsb & 0xFF));
 
 	//*****************************************************************
@@ -185,7 +187,7 @@ void myCPU::emulator()
 			drawFlag = true;
 			memset(gfx, 0x00, LENGTH_WORDS);
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -198,13 +200,13 @@ void myCPU::emulator()
 			regPC = regStack.pop();
 			--regSP;
 			regPC += 2; // correction from Laurence Muller [6]
-			i = regPC;
+			index = regPC;
 			break;
 
 		default:
 			regPC += 1;
-			i = regPC;
-			//cout << i << ": 0x0000: invalid instruction - " << inst << endl;
+			index = regPC;
+			//cout << index << ": 0x0000: invalid instruction - " << inst << endl;
 			break;
 		}
 		break;
@@ -216,7 +218,7 @@ void myCPU::emulator()
 		//	The interpreter sets the program counter to nnn.
 		//*****************************************************************
 		regPC = (0x0FFF & inst);
-		i = regPC;
+		index = regPC;
 		break;
 
 		//*****************************************************************
@@ -230,7 +232,7 @@ void myCPU::emulator()
 		++regSP;
 		regStack.push(regPC);
 		regPC = (0x0FFF & inst);
-		i = regPC;
+		index = regPC;
 		break;
 
 	case 0x3000:
@@ -243,12 +245,12 @@ void myCPU::emulator()
 		if (regVx[((0x0F00 & inst) >> 8)] == (0x00FF & inst))
 		{
 			regPC += 4;
-			i = regPC;
+			index = regPC;
 		}
 		else
 		{
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 		}
 		break;
 
@@ -262,12 +264,12 @@ void myCPU::emulator()
 		if (regVx[((0x0F00 & inst) >> 8)] != (0x00FF & inst))
 		{
 			regPC += 4;
-			i = regPC;
+			index = regPC;
 		}
 		else
 		{
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 		}
 		break;
 
@@ -281,12 +283,12 @@ void myCPU::emulator()
 		if (regVx[((0x0F00 & inst) >> 8)] == regVx[((0x00F0 & inst) >> 4)])
 		{
 			regPC += 4;
-			i = regPC;
+			index = regPC;
 		}
 		else
 		{
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 		}
 		break;
 
@@ -298,7 +300,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		regVx[((0x0F00 & inst) >> 8)] = (unsigned char)(0x00FF & inst);
 		regPC += 2;
-		i = regPC;
+		index = regPC;
 		break;
 
 	case 0x7000:
@@ -310,7 +312,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		regVx[((0x0F00 & inst) >> 8)] += (unsigned char)(0x00FF & inst);
 		regPC += 2;
-		i = regPC;
+		index = regPC;
 		break;
 
 	case 0x8000:
@@ -324,7 +326,7 @@ void myCPU::emulator()
 		case 0x0000:
 			regVx[((0x0F00 & inst) >> 8)] = regVx[((0x00F0 & inst) >> 4)];
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -336,7 +338,7 @@ void myCPU::emulator()
 		case 0x0001:
 			regVx[((0x0F00 & inst) >> 8)] |= regVx[((0x00F0 & inst) >> 4)];
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -348,7 +350,7 @@ void myCPU::emulator()
 		case 0x0002:
 			regVx[((0x0F00 & inst) >> 8)] &= regVx[((0x00F0 & inst) >> 4)];
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -360,14 +362,14 @@ void myCPU::emulator()
 		case 0x0003:
 			regVx[((0x0F00 & inst) >> 8)] ^= regVx[((0x00F0 & inst) >> 4)];
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
 			// (15)	8xy4 - ADD Vx, Vy
 			//	Set Vx = Vx + Vy, set VF = carry.
 			//	The values of Vx and Vy are added together.
-			//   If the result is greater than 8 bits(i.e., > 255, ) 
+			//   If the result is greater than 8 bits(index.e., > 255, ) 
 			//   VF is set to 1, otherwise 0. 
 			//  Only the lowest 8 bits of the result are kept, and stored in Vx.
 			//*****************************************************************
@@ -390,7 +392,7 @@ void myCPU::emulator()
 			// TBD - neither Laurence or Lyndon do this step
 			// regVx[((0x0F00 & inst) >> 8)] &= 0xF;
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -408,7 +410,7 @@ void myCPU::emulator()
 
 			regVx[((0x0F00 & inst) >> 8)] -= regVx[((0x00F0 & inst) >> 4)];
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -421,7 +423,7 @@ void myCPU::emulator()
 			regVx[0xF] = (regVx[((0x0F00 & inst) >> 8)] & 0x1);
 			regVx[((0x0F00 & inst) >> 8)] >>= 1; // corrected from Laurence Muller's solution [6]
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -439,7 +441,7 @@ void myCPU::emulator()
 
 			regVx[((0x0F00 & inst) >> 8)] = regVx[((0x00F0 & inst) >> 4)] - regVx[((0x0F00 & inst) >> 8)];
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -452,13 +454,13 @@ void myCPU::emulator()
 			regVx[0xF] = (regVx[((0x0F00 & inst) >> 8)] >> 7); // corrected from Laurence Muller's solution [6]
 			regVx[((0x0F00 & inst) >> 8)] <<= 1; // corrected from Laurence Muller's solution [6]
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 		default:
 			regPC += 1;
-			i = regPC;
-			//cout << i << ": 0x8000: invalid instruction - " << inst << endl;
+			index = regPC;
+			//cout << index << ": 0x8000: invalid instruction - " << inst << endl;
 			break;
 		}
 		break;
@@ -473,12 +475,12 @@ void myCPU::emulator()
 		if (regVx[((0x0F00 & inst) >> 8)] != regVx[((0x00F0 & inst) >> 4)])
 		{
 			regPC += 4;
-			i = regPC;
+			index = regPC;
 		}
 		else // corrected from Laurence Muller's solution [6]
 		{
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 		}
 		break;
 
@@ -490,7 +492,7 @@ void myCPU::emulator()
 		//*****************************************************************
 		regI = (0x0FFF & inst);
 		regPC += 2;
-		i = regPC;
+		index = regPC;
 		break;
 
 	case 0xB000:
@@ -500,7 +502,7 @@ void myCPU::emulator()
 		//	The program counter is set to nnn plus the value of V0.
 		//*****************************************************************
 		regPC = (unsigned short)regVx[0] + (0x0FFF & inst);
-		i = regPC;
+		index = regPC;
 		break;
 
 	case 0xC000:
@@ -515,7 +517,7 @@ void myCPU::emulator()
 		unsigned char temp = (rand() % 0xFF); // [5], [6]
 		regVx[((0x0F00 & inst) >> 8)] = (unsigned char)(temp & ((0x00FF) & inst));
 		regPC += 2;
-		i = regPC;
+		index = regPC;
 	}
 	break;
 
@@ -560,7 +562,7 @@ void myCPU::emulator()
 		drawFlag = true;
 		regPC += 2;
 		///////////////////////////////////////////////////////////////////
-		i = regPC;
+		index = regPC;
 	}
 	break;
 	
@@ -582,7 +584,7 @@ void myCPU::emulator()
 			{
 				regPC += 2;
 			}
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -600,13 +602,13 @@ void myCPU::emulator()
 			{
 				regPC += 2;
 			}
-			i = regPC;
+			index = regPC;
 			break;
 
 		default:
 			regPC += 1;
-			i = regPC;
-			//cout << i << ": 0xE000: invalid instruction - " << inst << endl;
+			index = regPC;
+			//cout << index << ": 0xE000: invalid instruction - " << inst << endl;
 			break;
 		}
 		break;
@@ -622,7 +624,7 @@ void myCPU::emulator()
 		case 0x0007:
 			regVx[((0x0F00 & inst) >> 8)] = regDT;
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -653,7 +655,7 @@ void myCPU::emulator()
 				return;
 			///////////////////////////////////////////////////////////////////  
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 		}
 		break;
 
@@ -665,7 +667,7 @@ void myCPU::emulator()
 		case 0x0015:
 			regDT = regVx[((0x0F00 & inst) >> 8)];
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -684,7 +686,7 @@ void myCPU::emulator()
 			//  of the interpreter.
 			regST = regVx[((0x0F00 & inst) >> 8)];
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -709,7 +711,7 @@ void myCPU::emulator()
 			////////////////////////////////////////////////////////////////////////////
 			regI += regVx[((0x0F00 & inst) >> 8)];
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -725,7 +727,7 @@ void myCPU::emulator()
 			///////////////////////////////////////////////////////////////////  
 			regI = (unsigned short)(regVx[((inst & 0x0F00) >> 8)] * 0x5);
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -739,7 +741,7 @@ void myCPU::emulator()
 			chip8ram8[regI + 1] = ((regVx[((0x0F00 & inst) >> 8)] / 10) % 10); // corrected from Laurence Muller's solution [6]
 			chip8ram8[regI + 2] = ((regVx[((0x0F00 & inst) >> 8)] % 100) % 10); // corrected from Laurence Muller's solution [6]
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -757,7 +759,7 @@ void myCPU::emulator()
 			// Laurence Muller [6]
 			regI += (((inst & 0x0F00) >> 8) + 1);
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 			//*****************************************************************
@@ -776,13 +778,13 @@ void myCPU::emulator()
 			// Laurence Muller [6]
 			regI += (((inst & 0x0F00) >> 8) + 1);
 			regPC += 2;
-			i = regPC;
+			index = regPC;
 			break;
 
 		default:
 			regPC += 1;
-			i = regPC;
-			//cout << i << ": 0xF000: invalid instruction - " << inst << endl;
+			index = regPC;
+			//cout << index << ": 0xF000: invalid instruction - " << inst << endl;
 			break;
 		}
 		break;
@@ -790,8 +792,8 @@ void myCPU::emulator()
 		// Unknown instruction
 	default:
 		regPC += 1;
-		i = regPC;
-		//cout << i << ": default: invalid instruction - " << inst << endl;
+		index = regPC;
+		//cout << index << ": default: invalid instruction - " << inst << endl;
 	}
 
 	// Check on the timer registers ....
