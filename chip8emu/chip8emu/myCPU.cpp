@@ -146,7 +146,7 @@ void myCPU::emulator()
 	unsigned short inst = 0;
 
 	static bool firstentry = false;
-	static unsigned short i = 0;
+	static unsigned short i = 0x200;
 
 	if (firstentry == false)
 		mytimer.initTime(); // Initialize my timer for Timer Registers...
@@ -204,7 +204,7 @@ void myCPU::emulator()
 		default:
 			regPC += 1;
 			i = regPC;
-			cout << i << ": 0x0000: invalid instruction - " << inst << endl;
+			//cout << i << ": 0x0000: invalid instruction - " << inst << endl;
 			break;
 		}
 		break;
@@ -458,7 +458,7 @@ void myCPU::emulator()
 		default:
 			regPC += 1;
 			i = regPC;
-			cout << i << ": 0x8000: invalid instruction - " << inst << endl;
+			//cout << i << ": 0x8000: invalid instruction - " << inst << endl;
 			break;
 		}
 		break;
@@ -606,7 +606,7 @@ void myCPU::emulator()
 		default:
 			regPC += 1;
 			i = regPC;
-			cout << i << ": 0xE000: invalid instruction - " << inst << endl;
+			//cout << i << ": 0xE000: invalid instruction - " << inst << endl;
 			break;
 		}
 		break;
@@ -782,7 +782,7 @@ void myCPU::emulator()
 		default:
 			regPC += 1;
 			i = regPC;
-			cout << i << ": 0xF000: invalid instruction - " << inst << endl;
+			//cout << i << ": 0xF000: invalid instruction - " << inst << endl;
 			break;
 		}
 		break;
@@ -791,7 +791,7 @@ void myCPU::emulator()
 	default:
 		regPC += 1;
 		i = regPC;
-		cout << i << ": default: invalid instruction - " << inst << endl;
+		//cout << i << ": default: invalid instruction - " << inst << endl;
 	}
 
 	// Check on the timer registers ....
