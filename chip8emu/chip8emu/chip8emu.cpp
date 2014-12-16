@@ -1,4 +1,4 @@
-// chip8emu.cpp : Defines the entry point for the console application.
+// chip8emu.	cpp : Defines the entry point for the console application.
 // Author        : Lauren Rush
 // References    : See file headers.
 //                [1] command line params: http://www.cplusplus.com/articles/DEN36Up4/
@@ -132,7 +132,7 @@ void display()
 
 	// Slow down loop 
 	///////////////////////////////////////////////////////////////////////////
-	for (unsigned int t = 0; t < 300000; ++t);
+	for (unsigned int t = 1; t < 250000; t++);
 	///////////////////////////////////////////////////////////////////////////
 }
 

@@ -69,7 +69,7 @@ bool myCPU::loadROM(string filename)
 	unsigned short msb = 0;
 	unsigned short lsb = 0;
 	unsigned short inst = 0;
-	
+
 	unsigned short i = 0x0100; // Start at offset 0x0100, word offset
 	unsigned short j = 0x0200; // Start at offset 0x0200, byte offset
 
@@ -89,7 +89,7 @@ bool myCPU::loadROM(string filename)
 
 		// If ROM is an acceptable length, proceed ...
 		if ((end - begin) <= LENGTH_BYTES)
-		{			
+		{
 			cout << "Loading ROM....\n";
 			// Until the end of the file, grab bytes...
 			do {
@@ -150,61 +150,74 @@ void myCPU::emulator()
 
 	if (firstentry == false)
 		mytimer.initTime(); // Initialize my timer for Timer Registers...
-	
+
 	// Process ROM OpCodes...
-		// Reconstitute instruction, 2 bytes [2]
-		msb = 0;
-		lsb = 0;
-		inst = 0;
-		msb = (unsigned short)chip8ram8[i];
-		lsb = (unsigned short)chip8ram8[i+1];
-		inst = (((msb&0xFF) << 0x8) | (lsb&0xFF));
+	// Reconstitute instruction, 2 bytes [2]
+	msb = 0;
+	lsb = 0;
+	inst = 0;
+	msb = (unsigned short)chip8ram8[i];
+	lsb = (unsigned short)chip8ram8[i + 1];
+	inst = (((msb & 0xFF) << 0x8) | (lsb & 0xFF));
 
-		//*****************************************************************
-		// Parse Instructions [3]
-		//*****************************************************************
-		// (1) 0nnn - SYS addr
-		//	Jump to a machine code routine at nnn.
-		//	This instruction is only used on the old computers on which 
-		//	Chip - 8 was originally implemented.  
-		//  It is ignored by modern interpreters.
-
-		//*****************************************************************
-		// (2) 00E0 - CLS
-		//	Clear the display.
-		//*****************************************************************
-		if (inst == 0x00E0)
+	//*****************************************************************
+	// Parse Instructions [3], [6]
+	//  The following switch/case format is adapted from 
+	//  Laurence Muller's implementation [6].
+	//*****************************************************************
+	switch (inst & 0xF000) // ref. [6]
+	{
+	case 0x0000:
+		switch (inst & 0x00FF)
 		{
+			//*****************************************************************
+			// (1) 0nnn - SYS addr
+			//	Jump to a machine code routine at nnn.  This instruction is only
+			//	used on the old computers on which Chip8 was originally implemented.  
+			//  It is ignored by modern interpreters.
+			//*****************************************************************
+
+			//*****************************************************************
+			// (2) 00E0 - CLS
+			//	Clear the display.
+			//*****************************************************************
+		case 0x00E0:
 			drawFlag = true;
 			memset(gfx, 0x00, LENGTH_WORDS);
 			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (3) 00EE - RET
-		//	Return from a subroutine.
-		//  The interpreter sets the program counter to the address at the 
-		//  top of the stack, then subtracts 1 from the stack pointer.
-		//*****************************************************************
-		if (inst == 0x00EE)
-		{
+			//*****************************************************************
+			// (3) 00EE - RET
+			//	Return from a subroutine.
+			//  The interpreter sets the program counter to the address at the 
+			//  top of the stack, then subtracts 1 from the stack pointer.
+			//*****************************************************************
+		case 0x00EE:
 			regPC = regStack.pop();
 			--regSP;
 			regPC += 2; // correction from Laurence Muller [6]
 			i = regPC;
-		}
+			break;
 
+		default:
+			regPC += 1;
+			i = regPC;
+			cout << i << ": 0x0000: invalid instruction - " << inst << endl;
+			break;
+		}
+		break;
+
+	case 0x1000:
 		//*****************************************************************
 		// (4) 1nnn - JP addr
 		//	Jump to location nnn.
 		//	The interpreter sets the program counter to nnn.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0x1000)
-		{
-			regPC = (0x0FFF & inst);
-			i = regPC;
-		}
+		regPC = (0x0FFF & inst);
+		i = regPC;
+		break;
 
 		//*****************************************************************
 		// (5) 2nnn - CALL addr
@@ -213,165 +226,152 @@ void myCPU::emulator()
 		//  then puts the current PC on the top of the stack. 
 		//  The PC is then set to nnn.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0x2000)
-		{
-			++regSP;
-			regStack.push(regPC);
-			regPC = (0x0FFF & inst);
-			i = regPC;
-		}
+	case 0x2000:
+		++regSP;
+		regStack.push(regPC);
+		regPC = (0x0FFF & inst);
+		i = regPC;
+		break;
 
+	case 0x3000:
 		//*****************************************************************
 		// (6) 3xkk - SE Vx, byte
 		//	Skip next instruction if Vx = kk.
 		//	The interpreter compares register Vx to kk, and if they are 
 		//  equal, increments the program counter by 2.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0x3000)
+		if (regVx[((0x0F00 & inst) >> 8)] == (0x00FF & inst))
 		{
-			if (regVx[((0x0F00 & inst) >> 8)] == (0x00FF & inst))
-			{
-				regPC += 4;
-				i = regPC;
-			}
-			else
-			{
-				regPC += 2;
-				i = regPC;
-			}
+			regPC += 4;
+			i = regPC;
 		}
+		else
+		{
+			regPC += 2;
+			i = regPC;
+		}
+		break;
 
+	case 0x4000:
 		//*****************************************************************
 		// (7) 4xkk - SNE Vx, byte
 		//	Skip next instruction if Vx != kk.
 		//	The interpreter compares register Vx to kk, and if they are not
 		//  equal, increments the program counter by 2.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0x4000)
+		if (regVx[((0x0F00 & inst) >> 8)] != (0x00FF & inst))
 		{
-			if (regVx[((0x0F00 & inst) >> 8)] != (0x00FF & inst))
-			{
-				regPC += 4;
-				i = regPC;
-			}
-			else
-			{
-				regPC += 2;
-				i = regPC;
-			}
+			regPC += 4;
+			i = regPC;
 		}
+		else
+		{
+			regPC += 2;
+			i = regPC;
+		}
+		break;
 
+	case 0x5000:
 		//*****************************************************************
 		// (8) 5xy0 - SE Vx, Vy
 		//	Skip next instruction if Vx = Vy.
 		//	The interpreter compares register Vx to register Vy, and if 
 		//  they are equal, increments the program counter by 2.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0x5000)
+		if (regVx[((0x0F00 & inst) >> 8)] == regVx[((0x00F0 & inst) >> 4)])
 		{
-			if (regVx[((0x0F00 & inst) >> 8)] == regVx[((0x00F0 & inst) >> 4)])
-			{
-				regPC += 4;
-				i = regPC;
-			}
-			else
-			{
-				regPC += 2;
-				i = regPC;
-			}
+			regPC += 4;
+			i = regPC;
 		}
+		else
+		{
+			regPC += 2;
+			i = regPC;
+		}
+		break;
 
+	case 0x6000:
 		//*****************************************************************
 		// (9) 6xkk - LD Vx, byte
 		//	Set Vx = kk.
 		//	The interpreter puts the value kk into register Vx.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0x6000)
-		{
-			regVx[((0x0F00 & inst) >> 8)] = (unsigned char)(0x00FF & inst);
-			regPC += 2;
-			i = regPC;
-		}
+		regVx[((0x0F00 & inst) >> 8)] = (unsigned char)(0x00FF & inst);
+		regPC += 2;
+		i = regPC;
+		break;
 
+	case 0x7000:
 		//*****************************************************************
 		// (10)	7xkk - ADD Vx, byte
 		//	Set Vx = Vx + kk.
 		//	Adds the value kk to the value of register Vx, then stores the 
 		//  result in Vx.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0x7000)
-		{
-			regVx[((0x0F00 & inst) >> 8)] += (unsigned char)(0x00FF & inst);
+		regVx[((0x0F00 & inst) >> 8)] += (unsigned char)(0x00FF & inst);
+		regPC += 2;
+		i = regPC;
+		break;
 
-			regPC += 2;
-			i = regPC;
-		}
-
-		//*****************************************************************
-		// (11)	8xy0 - LD Vx, Vy
-		//	Set Vx = Vy.
-		//	Stores the value of register Vy in register Vx.
-		//*****************************************************************
-		else if ((inst & 0xF00F) == 0x8000)
+	case 0x8000:
+		switch (inst & 0x000F)
 		{
+			//*****************************************************************
+			// (11)	8xy0 - LD Vx, Vy
+			//	Set Vx = Vy.
+			//	Stores the value of register Vy in register Vx.
+			//*****************************************************************
+		case 0x0000:
 			regVx[((0x0F00 & inst) >> 8)] = regVx[((0x00F0 & inst) >> 4)];
-
 			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (12)	8xy1 - OR Vx, Vy
-		//	Set Vx = Vx OR Vy.
-		//	Performs a bitwise OR on the values of Vx and Vy, then stores 
-		//  the result in Vx.
-		//*****************************************************************
-		else if ((inst & 0xF00F) == 0x8001)
-		{
+			//*****************************************************************
+			// (12)	8xy1 - OR Vx, Vy
+			//	Set Vx = Vx OR Vy.
+			//	Performs a bitwise OR on the values of Vx and Vy, then stores 
+			//  the result in Vx.
+			//*****************************************************************
+		case 0x0001:
 			regVx[((0x0F00 & inst) >> 8)] |= regVx[((0x00F0 & inst) >> 4)];
-
-			regPC+=2;
+			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (13)	8xy2 - AND Vx, Vy
-		//	Set Vx = Vx AND Vy.
-		//	Performs a bitwise AND on the values of Vx and Vy, then stores 
-		//  the result in Vx.
-		//*****************************************************************
-		else if ((inst & 0xF00F) == 0x8002)
-		{
+			//*****************************************************************
+			// (13)	8xy2 - AND Vx, Vy
+			//	Set Vx = Vx AND Vy.
+			//	Performs a bitwise AND on the values of Vx and Vy, then stores 
+			//  the result in Vx.
+			//*****************************************************************
+		case 0x0002:
 			regVx[((0x0F00 & inst) >> 8)] &= regVx[((0x00F0 & inst) >> 4)];
-
-			regPC+=2;
+			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (14)	8xy3 - XOR Vx, Vy
-		//	Set Vx = Vx XOR Vy.
-		//	Performs a bitwise exclusive OR on the values of Vx and Vy, 
-		//  then stores the result in Vx.
-		//*****************************************************************
-		else if ((inst & 0xF00F) == 0x8003)
-		{
+			//*****************************************************************
+			// (14)	8xy3 - XOR Vx, Vy
+			//	Set Vx = Vx XOR Vy.
+			//	Performs a bitwise exclusive OR on the values of Vx and Vy, 
+			//  then stores the result in Vx.
+			//*****************************************************************
+		case 0x0003:
 			regVx[((0x0F00 & inst) >> 8)] ^= regVx[((0x00F0 & inst) >> 4)];
-
-			regPC+=2;
+			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (15)	8xy4 - ADD Vx, Vy
-		//	Set Vx = Vx + Vy, set VF = carry.
-		//	The values of Vx and Vy are added together.
-		//   If the result is greater than 8 bits(i.e., > 255, ) 
-		//   VF is set to 1, otherwise 0. 
-		//  Only the lowest 8 bits of the result are kept, and stored in Vx.
-		//*****************************************************************
-		else if ((inst & 0xF00F) == 0x8004)
-		{
+			//*****************************************************************
+			// (15)	8xy4 - ADD Vx, Vy
+			//	Set Vx = Vx + Vy, set VF = carry.
+			//	The values of Vx and Vy are added together.
+			//   If the result is greater than 8 bits(i.e., > 255, ) 
+			//   VF is set to 1, otherwise 0. 
+			//  Only the lowest 8 bits of the result are kept, and stored in Vx.
+			//*****************************************************************
+		case 0x0004:
 			// Vx = Vx + Vy
 			regVx[((0x0F00 & inst) >> 8)] += regVx[((0x00F0 & inst) >> 4)];
 
@@ -382,24 +382,24 @@ void myCPU::emulator()
 				regVx[0xF] = 1;
 			}
 			else
+			{
 				regVx[0xF] = 0;
+			}
 
 			//  Only the lowest 8 bits of the result are kept, and stored in Vx.
 			// TBD - neither Laurence or Lyndon do this step
 			// regVx[((0x0F00 & inst) >> 8)] &= 0xF;
-
-			regPC+=2;
+			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (16)	8xy5 - SUB Vx, Vy
-		//	Set Vx = Vx - Vy, set VF = NOT borrow.
-		//	If Vx > Vy, then VF is set to 1, otherwise 0. 
-		//  Then Vy is subtracted from Vx, and the results stored in Vx.
-		//*****************************************************************
-		else if ((inst & 0xF00F) == 0x8005)
-		{
+			//*****************************************************************
+			// (16)	8xy5 - SUB Vx, Vy
+			//	Set Vx = Vx - Vy, set VF = NOT borrow.
+			//	If Vx > Vy, then VF is set to 1, otherwise 0. 
+			//  Then Vy is subtracted from Vx, and the results stored in Vx.
+			//*****************************************************************
+		case 0x0005:
 			// if Vx > Vy, set to 1, otherwise 0
 			if (regVx[((0x0F00 & inst) >> 8)] > regVx[((0x00F0 & inst) >> 4)])
 				regVx[0xF] = 1;
@@ -407,34 +407,30 @@ void myCPU::emulator()
 				regVx[0xF] = 0; // corrected from Laurence Muller's solution [6]
 
 			regVx[((0x0F00 & inst) >> 8)] -= regVx[((0x00F0 & inst) >> 4)];
-
-			regPC+=2;
-			i = regPC;
-		}
-
-		//*****************************************************************
-		// (17)	8xy6 - SHR Vx{ , Vy }
-		//  Set Vx = Vx SHR 1.
-		//	If the least - significant bit of Vx is 1, then VF is set to 1, 
-		//  otherwise 0. Then Vx is divided by 2.
-		//*****************************************************************
-		else if ((inst & 0xF00F) == 0x8006)
-		{
-			regVx[0xF] = (regVx[((0x0F00 & inst) >> 8)] & 0x1);
-			regVx[((0x0F00 & inst) >> 8)] >>= 1; // corrected from Laurence Muller's solution [6]
-
 			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (18)	8xy7 - SUBN Vx, Vy
-		//	Set Vx = Vy - Vx, set VF = NOT borrow.
-		//	If Vy > Vx, then VF is set to 1, otherwise 0. 
-		//  Then Vx is subtracted from Vy, and the results stored in Vx.
-		//*****************************************************************
-		else if ((inst & 0xF00F) == 0x8007)
-		{
+			//*****************************************************************
+			// (17)	8xy6 - SHR Vx{ , Vy }
+			//  Set Vx = Vx SHR 1.
+			//	If the least - significant bit of Vx is 1, then VF is set to 1, 
+			//  otherwise 0. Then Vx is divided by 2.
+			//*****************************************************************
+		case 0x0006:
+			regVx[0xF] = (regVx[((0x0F00 & inst) >> 8)] & 0x1);
+			regVx[((0x0F00 & inst) >> 8)] >>= 1; // corrected from Laurence Muller's solution [6]
+			regPC += 2;
+			i = regPC;
+			break;
+
+			//*****************************************************************
+			// (18)	8xy7 - SUBN Vx, Vy
+			//	Set Vx = Vy - Vx, set VF = NOT borrow.
+			//	If Vy > Vx, then VF is set to 1, otherwise 0. 
+			//  Then Vx	is subtracted from Vy, and the results stored in Vx.
+			//*****************************************************************
+		case 0x0007:
 			// If Vy > Vx, set VF to 1, otherwise 0
 			if (regVx[((0x00F0 & inst) >> 4)] > regVx[((0x0F00 & inst) >> 8)])
 				regVx[0xF] = 1;
@@ -442,69 +438,73 @@ void myCPU::emulator()
 				regVx[0xF] = 0;
 
 			regVx[((0x0F00 & inst) >> 8)] = regVx[((0x00F0 & inst) >> 4)] - regVx[((0x0F00 & inst) >> 8)];
-
-			regPC+=2;
+			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (19)	8xyE - SHL Vx{ , Vy }
-		//  Set Vx = Vx SHL 1.
-		//	If the most significant bit of Vx is 1, then VF is set to 1, 
-		//  otherwise to 0. Then Vx is multiplied by 2.
-		//*****************************************************************
-		else if ((inst & 0xF00F) == 0x800E)
-		{
+			//*****************************************************************
+			// (19)	8xyE - SHL Vx{ , Vy }
+			//  Set Vx = Vx SHL 1.
+			//	If the most significant bit of Vx is 1, then VF is set to 1, 
+			//  otherwise to 0. Then Vx is multiplied by 2.
+			//*****************************************************************
+		case 0x000E:
 			regVx[0xF] = (regVx[((0x0F00 & inst) >> 8)] >> 7); // corrected from Laurence Muller's solution [6]
 			regVx[((0x0F00 & inst) >> 8)] <<= 1; // corrected from Laurence Muller's solution [6]
-
-			regPC+=2;
+			regPC += 2;
 			i = regPC;
-		}
+			break;
 
+		default:
+			regPC += 1;
+			i = regPC;
+			cout << i << ": 0x8000: invalid instruction - " << inst << endl;
+			break;
+		}
+		break;
+
+	case 0x9000:
 		//*****************************************************************
 		// (20)	9xy0 - SNE Vx, Vy
 		//	Skip next instruction if Vx != Vy.
 		//	The values of Vx and Vy are compared, and if they are not 
 		//  equal, the program counter is increased by 2.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0x9000)
+		if (regVx[((0x0F00 & inst) >> 8)] != regVx[((0x00F0 & inst) >> 4)])
 		{
-			if (regVx[((0x0F00 & inst) >> 8)] != regVx[((0x00F0 & inst) >> 4)])
-			{
-				regPC += 4;
-				i = regPC;
-			}
-			else // corrected from Laurence Muller's solution [6]
-			{
-				regPC += 2;
-				i = regPC;
-			}
+			regPC += 4;
+			i = regPC;
 		}
+		else // corrected from Laurence Muller's solution [6]
+		{
+			regPC += 2;
+			i = regPC;
+		}
+		break;
 
+	case 0xA000:
 		//*****************************************************************
 		// (21)	Annn - LD I, addr
 		//	Set I = nnn.
 		//	The value of register I is set to nnn.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0xA000)
-		{
-			regI = (0x0FFF & inst);
-			regPC+=2;
-			i = regPC;
-		}
+		regI = (0x0FFF & inst);
+		regPC += 2;
+		i = regPC;
+		break;
 
+	case 0xB000:
 		//*****************************************************************
 		// (22)	Bnnn - JP V0, addr
 		//	Jump to location nnn + V0.
 		//	The program counter is set to nnn plus the value of V0.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0xB000)
-		{
-			regPC = (unsigned short)regVx[0] + (0x0FFF & inst);
-			i = regPC;
-		}
+		regPC = (unsigned short)regVx[0] + (0x0FFF & inst);
+		i = regPC;
+		break;
 
+	case 0xC000:
+	{
 		//*****************************************************************
 		// (23)	Cxkk - RND Vx, byte
 		//	Set Vx = random byte AND kk.
@@ -512,16 +512,15 @@ void myCPU::emulator()
 		//   is then ANDed with the value kk.
 		//  The results are stored in Vx.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0xC000)
-		{
-			unsigned char temp = (rand() % 0xFF); // [5], [6]
-			regVx[((0x0F00 & inst) >> 8)] = (unsigned char)(temp & ((0x00FF) & inst));
+		unsigned char temp = (rand() % 0xFF); // [5], [6]
+		regVx[((0x0F00 & inst) >> 8)] = (unsigned char)(temp & ((0x00FF) & inst));
+		regPC += 2;
+		i = regPC;
+	}
+	break;
 
-			regPC += 2;
-			i = regPC;
-		}
-
-		
+	case 0xD000:
+	{
 		//*****************************************************************
 		// (24)	Dxyn - DRW Vx, Vy, nibble
 		//	(1) Display n - byte sprite starting at memory location I 
@@ -536,50 +535,45 @@ void myCPU::emulator()
 		//  See instruction 8xy3 for more information on XOR, and section 2.4, 
 		//  Display, for more information on the Chip - 8 screen and sprites.
 		//*****************************************************************
-		else if ((inst & 0xF000) == 0xD000)
+		///////////////////////////////////////////////////////////////////
+		// The following code belongs to Laurence Muller
+		// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
+		///////////////////////////////////////////////////////////////////  
+		unsigned char x = regVx[((inst & 0x0F00) >> 8)];
+		unsigned char y = regVx[((inst & 0x00F0) >> 4)];
+		unsigned short height = (inst & 0x000F);
+		unsigned short pixel = 0;
+		regVx[0xF] = 0;
+		for (int yline = 0; yline < height; yline++)
 		{
-			///////////////////////////////////////////////////////////////////
-			// The following code belongs to Laurence Muller
-			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
-			///////////////////////////////////////////////////////////////////  
-			unsigned char x = regVx[((inst & 0x0F00) >> 8)];
-			unsigned char y = regVx[((inst & 0x00F0) >> 4)];
-			unsigned short height = (inst & 0x000F);
-			unsigned short pixel = 0;
-
-			regVx[0xF] = 0;
-			for (int yline = 0; yline < height; yline++)
+			pixel = chip8ram8[(regI + yline)];
+			for (int xline = 0; xline < 8; xline++)
 			{
-				pixel = chip8ram8[(regI + yline)]; 
-				
-				for (int xline = 0; xline < 8; xline++)
-				{
-					if ((pixel & (0x80 >> xline)) != 0)
-					{
-						if (gfx[(x + xline + ((y + yline) * 64))] == 1)
-						{
-							regVx[0xF] = 1;
-						}
- 
-						gfx[(x + xline + ((y + yline) * 64))] ^= 1;
-					}
+				if ((pixel & (0x80 >> xline)) != 0)
+				{	
+					if (gfx[(x + xline + ((y + yline) * 64))] == 1)
+					   regVx[0xF] = 1;
+				   gfx[(x + xline + ((y + yline) * 64))] ^= 1;
 				}
 			}
-
-			drawFlag = true;
-			regPC += 2;
-			///////////////////////////////////////////////////////////////////
-			i = regPC;
 		}
-		
-		//*****************************************************************
-		// (25) Ex9E - SKP Vx
-		//	Skip next instruction if key with the value of Vx is pressed.
-		//	Checks the keyboard, and if the key corresponding to the value 
-		//  of Vx is currently in the down position, PC is increased by 2.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xE09E)
+		drawFlag = true;
+		regPC += 2;
+		///////////////////////////////////////////////////////////////////
+		i = regPC;
+	}
+	break;
+	
+	case 0xE000:
+		switch (inst & 0x00FF)
 		{
+			//*****************************************************************
+			// (25) Ex9E - SKP Vx
+			//	Skip next instruction if key with the value of Vx is pressed.
+			//	Checks the keyboard, and if the key corresponding to the value 
+			//  of Vx is currently in the down position, PC is increased by 2.
+			//*****************************************************************
+		case 0x009E:
 			if (key[regVx[((inst & 0x0F00) >> 8)]] != 0) // corrected from Laurence Muller's solution [6]
 			{
 				regPC += 4;
@@ -589,16 +583,15 @@ void myCPU::emulator()
 				regPC += 2;
 			}
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (26) ExA1 - SKNP Vx
-		//	Skip next instruction if key with the value of Vx is not pressed.
-		//	Checks the keyboard, and if the key corresponding to the value 
-		//  of Vx is currently in the up position, PC is increased by 2.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xE0A1)
-		{
+			//*****************************************************************
+			// (26) ExA1 - SKNP Vx
+			//	Skip next instruction if key with the value of Vx is not pressed.
+			//	Checks the keyboard, and if the key corresponding to the value 
+			//  of Vx is currently in the up position, PC is increased by 2.
+			//*****************************************************************
+		case 0x0A1:
 			if (key[regVx[((inst & 0x0F00) >> 8)]] == 0) // corrected from Laurence Muller's solution [6]
 			{
 				regPC += 4;
@@ -608,28 +601,37 @@ void myCPU::emulator()
 				regPC += 2;
 			}
 			i = regPC;
+			break;
+
+		default:
+			regPC += 1;
+			i = regPC;
+			cout << i << ": 0xE000: invalid instruction - " << inst << endl;
+			break;
 		}
+		break;
 
-		//*****************************************************************
-		// (27)	Fx07 - LD Vx, DT
-		//	Set Vx = delay timer value.
-		//	The value of DT is placed into Vx.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xF007)
+	case 0xF000:
+		switch (inst & 0x00FF)
 		{
+			//*****************************************************************
+			// (27)	Fx07 - LD Vx, DT
+			//	Set Vx = delay timer value.
+			//	The value of DT is placed into Vx.
+			//*****************************************************************
+		case 0x0007:
 			regVx[((0x0F00 & inst) >> 8)] = regDT;
-
 			regPC += 2;
 			i = regPC;
-		}
-		
-		//*****************************************************************
-		// (28)	Fx0A - LD Vx, K
-		//	Wait for a key press, store the value of the key in Vx.
-		//	All execution stops until a key is pressed, then the value of 
-		//  that key is stored in Vx.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xF00A)
+			break;
+
+			//*****************************************************************
+			// (28)	Fx0A - LD Vx, K
+			//	Wait for a key press, store the value of the key in Vx.
+			//	All execution stops until a key is pressed, then the value of 
+			//  that key is stored in Vx.
+			//*****************************************************************
+		case 0x000A:
 		{
 			///////////////////////////////////////////////////////////////////
 			// The following code belongs to Laurence Muller
@@ -653,26 +655,25 @@ void myCPU::emulator()
 			regPC += 2;
 			i = regPC;
 		}
+		break;
 
 		//*****************************************************************
 		// (29)	Fx15 - LD DT, Vx
 		//	Set delay timer = Vx.
 		//	DT is set equal to the value of Vx.
 		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xF015)
-		{
+		case 0x0015:
 			regDT = regVx[((0x0F00 & inst) >> 8)];
 			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (30)	Fx18 - LD ST, Vx
-		//	Set sound timer = Vx.
-		//	ST is set equal to the value of Vx.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xF018)
-		{
+			//*****************************************************************
+			// (30)	Fx18 - LD ST, Vx
+			//	Set sound timer = Vx.
+			//	ST is set equal to the value of Vx.
+			//*****************************************************************
+		case 0x0018:
 			// The sound timer is active whenever the sound timer register
 			// (ST)is non - zero.  This timer also decrements at a rate of 
 			// 60Hz, however, as long as ST's value is greater than zero,
@@ -684,21 +685,20 @@ void myCPU::emulator()
 			regST = regVx[((0x0F00 & inst) >> 8)];
 			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (31)	Fx1E - ADD I, Vx
-		//	Set I = I + Vx.
-		//	The values of I and Vx are added, and the results are stored in I.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xF01E)
-		{
+			//*****************************************************************
+			// (31)	Fx1E - ADD I, Vx
+			//	Set I = I + Vx.
+			//	The values of I and Vx are added, and the results are stored in I.
+			//*****************************************************************
+		case 0x001E:
 			///////////////////////////////////////////////////////////////////
 			// The following instruction belongs to Laurence Muller
 			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
 			///////////////////////////////////////////////////////////////////  
 			// VF is set to 1 when range overflow (I+VX>0xFFF), and 0 when there isn't.
-			if ((regI + regVx[(inst & 0x0F00) >> 8]) > 0xFFF)	
+			if ((regI + regVx[(inst & 0x0F00) >> 8]) > 0xFFF)
 			{
 				regVx[0xF] = 1;
 			}
@@ -707,20 +707,18 @@ void myCPU::emulator()
 				regVx[0xF] = 0;
 			}
 			////////////////////////////////////////////////////////////////////////////
-
 			regI += regVx[((0x0F00 & inst) >> 8)];
 			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (32)	Fx29 - LD F, Vx
-		//	Set I = location of sprite for digit Vx.
-		//	The value of I is set to the location for the hexadecimal 
-		//  sprite corresponding to the value of Vx.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xF029)
-		{
+			//*****************************************************************
+			// (32)	Fx29 - LD F, Vx
+			//	Set I = location of sprite for digit Vx.
+			//	The value of I is set to the location for the hexadecimal 
+			//  sprite corresponding to the value of Vx.
+			//*****************************************************************
+		case 0x0029:
 			///////////////////////////////////////////////////////////////////
 			// The following instruction belongs to Laurence Muller
 			// http://www.multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
@@ -728,52 +726,47 @@ void myCPU::emulator()
 			regI = (unsigned short)(regVx[((inst & 0x0F00) >> 8)] * 0x5);
 			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (33)	Fx33 - LD B, Vx
-		//	Store BCD representation of Vx in memory locations I, I + 1, and I + 2.
-		//	The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location 
-		//   in I, the tens digit at location I + 1, and the ones digit at location I + 2.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xF033)
-		{
+			//*****************************************************************
+			// (33)	Fx33 - LD B, Vx
+			//	Store BCD representation of Vx in memory locations I, I + 1, and I + 2.
+			//	The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location 
+			//   in I, the tens digit at location I + 1, and the ones digit at location I + 2.
+			//*****************************************************************
+		case 0x0033:
 			chip8ram8[regI] = ((regVx[((0x0F00 & inst) >> 8)] / 100)); // corrected from Laurence Muller's solution [6]
-			chip8ram8[regI+1] = ((regVx[((0x0F00 & inst) >> 8)] / 10) % 10); // corrected from Laurence Muller's solution [6]
-			chip8ram8[regI+2] = ((regVx[((0x0F00 & inst) >> 8)] % 100) % 10); // corrected from Laurence Muller's solution [6]
+			chip8ram8[regI + 1] = ((regVx[((0x0F00 & inst) >> 8)] / 10) % 10); // corrected from Laurence Muller's solution [6]
+			chip8ram8[regI + 2] = ((regVx[((0x0F00 & inst) >> 8)] % 100) % 10); // corrected from Laurence Muller's solution [6]
 			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//***********`******************************************************
-		// (34)	Fx55 - LD[I], Vx
-		//	Store registers V0 through Vx in memory starting at location I.
-		//	The interpreter copies the values of registers V0 through Vx 
-		//  into memory, starting at the address in I.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xF055)
-		{
+			//*****************************************************************
+			// (34)	Fx55 - LD[I], Vx
+			//	Store registers V0 through Vx in memory starting at location I.
+			//	The interpreter copies the values of registers V0 through Vx 
+			//  into memory, starting at the address in I.
+			//*****************************************************************
+		case 0x0055:
 			for (unsigned short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution [6]
 			{
 				chip8ram8[(regI + m)] = regVx[m]; // corrected from Laurence Muller's solution [6]
 			}
-
 			// On the original interpreter, when the operation is done, I = I + X + 1.
 			// Laurence Muller [6]
 			regI += (((inst & 0x0F00) >> 8) + 1);
-
 			regPC += 2;
 			i = regPC;
-		}
+			break;
 
-		//*****************************************************************
-		// (35)	Fx65 - LD Vx, [I]
-		//	Read registers V0 through Vx from memory starting at location I.
-		//	The interpreter reads values from memory starting at location I 
-		//  into registers V0 through Vx.
-		//*****************************************************************
-		else if ((inst & 0xF0FF) == 0xF065)
-		{
+			//*****************************************************************
+			// (35)	Fx65 - LD Vx, [I]
+			//	Read registers V0 through Vx from memory starting at location I.
+			//	The interpreter reads values from memory starting at location I 
+			//  into registers V0 through Vx.
+			//*****************************************************************
+		case 0x0065:
 			for (unsigned short m = 0; m <= ((0x0F00 & inst) >> 8); m++) // corrected from Laurence Muller's solution [6]
 			{
 				regVx[m] = chip8ram8[(regI + m)]; // corrected from Laurence Muller's solution [6]
@@ -782,16 +775,25 @@ void myCPU::emulator()
 			// On the original interpreter, when the operation is done, I = I + X + 1.
 			// Laurence Muller [6]
 			regI += (((inst & 0x0F00) >> 8) + 1);
-
 			regPC += 2;
 			i = regPC;
-		}
-		else // unknown instruction
-		{
-			regPC += 2;
-			i = regPC;
-		}
+			break;
 
-		// Check on the timer registers ....
-		mytimer.handleTimers(regST, regDT);
-} 
+		default:
+			regPC += 1;
+			i = regPC;
+			cout << i << ": 0xF000: invalid instruction - " << inst << endl;
+			break;
+		}
+		break;
+
+		// Unknown instruction
+	default:
+		regPC += 1;
+		i = regPC;
+		cout << i << ": default: invalid instruction - " << inst << endl;
+	}
+
+	// Check on the timer registers ....
+	mytimer.handleTimers(regST, regDT);
+}
